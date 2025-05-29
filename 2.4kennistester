@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kennis Challenge: Gezondheidsbevordering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        .study-material-box {
+            background-color: #eef2ff; /* Light indigo background */
+            border-left: 4px solid #6366f1; /* Indigo border */
+        }
+        .feedback-correct {
+            background-color: #dcfce7; /* Light green */
+            color: #166534; /* Dark green */
+            border-left: 4px solid #22c55e; /* Green border */
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2; /* Light red */
+            color: #991b1b; /* Dark red */
+            border-left: 4px solid #ef4444; /* Red border */
+        }
+        .answer-btn {
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .answer-btn:hover {
+            background-color: #e0e7ff; /* Lighter indigo on hover */
+        }
+        .answer-btn.selected-correct {
+            background-color: #22c55e !important; /* Green */
+            color: white !important;
+            border-color: #16a34a;
+        }
+        .answer-btn.selected-incorrect {
+            background-color: #ef4444 !important; /* Red */
+            color: white !important;
+            border-color: #dc2626;
+        }
+        .answer-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .progress-bar-container {
+            background-color: #e5e7eb; /* Gray-200 */
+            border-radius: 0.375rem; /* rounded-md */
+            overflow: hidden;
+        }
+        .progress-bar {
+            background-color: #4f46e5; /* Indigo-600 */
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 to-slate-700 text-slate-100">
+
+    <div class="w-full max-w-3xl bg-slate-800 shadow-2xl rounded-xl p-6 md:p-10">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Kennis Challenge!</h1>
+            <p class="text-slate-400 mt-1">Test je kennis over Gezondheidsbevordering</p>
+        </header>
+
+        <div id="game-area">
+            <div class="flex justify-between items-center mb-6">
+                <p class="text-lg font-semibold">Score: <span id="score" class="text-yellow-400">0</span></p>
+                <p class="text-sm text-slate-400">Vraag <span id="question-counter">1</span> van <span id="total-questions">0</span></p>
+            </div>
+            <div class="progress-bar-container w-full h-2.5 mb-6">
+                <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+            </div>
+
+            <div id="question-container" class="mb-6">
+                <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-4 text-slate-100">Vraag wordt geladen...</h2>
+            </div>
+
+            <div id="study-material-container" class="mb-6 p-4 study-material-box rounded-lg shadow">
+                <h3 class="text-md font-semibold mb-2 text-indigo-700">Relevante Studiestof:</h3>
+                <ul id="study-material-list" class="list-disc list-inside text-sm text-indigo-600 space-y-1">
+                    </ul>
+            </div>
+
+            <div id="answers-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                </div>
+
+            <div id="feedback-container" class="p-4 rounded-lg min-h-[50px] mb-6" role="alert" aria-live="polite">
+                </div>
+
+            <button id="next-question-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                Volgende Vraag
+            </button>
+        </div>
+
+        <div id="end-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Spel Voorbij!</h2>
+            <p class="text-xl mb-2">Je eindscore is: <span id="final-score" class="font-bold text-yellow-400">0</span></p>
+            <p id="final-message" class="text-lg mb-6 text-slate-300"></p>
+            <button id="restart-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-150 ease-in-out">
+                Opnieuw Spelen
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Een landelijke campagne heeft als doel te voorkomen dat mensen diabetes type 2 ontwikkelen, door het promoten van gezonde voeding en regelmatige lichaamsbeweging onder de algemene bevolking. Welk specifiek type preventie is dit volgens Brug (2017)?",
+                studyMaterial: [
+                    "In preventie van ziekten zijn er drie aanknopingspunten waar bevordering van gezond gedrag belangrijk is: primaire preventie, secundaire preventie of vroege opsporing, en tertiaire preventie.",
+                    "Primaire preventie: richten we ons op het voorkomen van een gezondheidsprobleem door het wegnemen van oorzaken of risicofactoren voor aandoeningen.",
+                    "Voorbeeld: > preventie van hart- en vaatziekten door stoppen met roken maatregelen > Een medische vorm van primaire ziekte­ preventie is vaccinatie"
+                ],
+                options: [
+                    { text: "Primaire preventie", correct: true },
+                    { text: "Secundaire preventie", correct: false },
+                    { text: "Tertiaire preventie", correct: false },
+                    { text: "Geïndiceerde preventie", correct: false }
+                ],
+                explanation: "Dit is een voorbeeld van <strong>primaire preventie</strong>. Primaire preventie heeft als doel een gezondheidsprobleem te voorkomen door oorzaken of risicofactoren weg te nemen. Het promoten van gezonde voeding en lichaamsbeweging om diabetes te voorkomen past binnen deze definitie."
+            },
+            {
+                question: "Een gezondheidsprogramma richt zich specifiek op personen bij wie via screening pre-diabetes is vastgesteld. Het programma wil hen interventies aanbieden om progressie naar volledige diabetes te voorkomen. Onder welke categorie van preventie, volgens het onderscheid tussen universele, selectieve, geïndiceerde en zorggerelateerde preventie, valt dit?",
+                studyMaterial: [
+                    "Tegenwoordig wordt vaker het onderscheid gemaakt tussen universele, selectieve, geïndiceerde en zorggerelateerde preventie:",
+                    "Selectieve preventie: is gericht op bevolkingsgroepen met een verhoogd risico en heeft als doel de gezondheid van specifieke risicogroepen te verbeteren -> secundaire prev.",
+                    "Omdat de preventie wordt aangeboden op basis van screening op een risicofactor",
+                    "Geïndiceerde preventie: richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen.",
+                    "Als doel het ontstaan van ziekte of verdere gezondheidsschade te voorkomen -> secundaire preventie en hoogrisicobenadering"
+                ],
+                options: [
+                    { text: "Universele preventie", correct: false },
+                    { text: "Selectieve preventie", correct: false },
+                    { text: "Geïndiceerde preventie", correct: true },
+                    { text: "Zorggerelateerde preventie", correct: false }
+                ],
+                explanation: "Dit valt onder <strong>geïndiceerde preventie</strong>. Geïndiceerde preventie richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen (zoals pre-diabetes) vertonen. Het doel is het ontstaan van de ziekte of verdere gezondheidsschade te voorkomen."
+            },
+            {
+                question: "Een school lanceert een uitgebreide anti-pestcampagne. Later blijkt echter uit data dat pestincidenten op school al extreem laag waren en niet als een significant probleem werden beschouwd door leerlingen of personeel. Welke van Brug's (2017) 'valkuilen' illustreert dit scenario het beste?",
+                studyMaterial: [
+                    "Hoe belangrijk het gebruik van het model is, willen we illustreren met een aantal veelvoorkomende valkuilen.",
+                    "Valkuil 1: Een niet bestaand probleem",
+                    "Soms kan het gebeuren dat er een project wordt ontwikkeld voor een probleem dat bij nader inzien niet of nauwelijks bestaat.",
+                    "Het is en blijft essentieel om altijd goed na te gaan hoe ernstig een gezondheidsprobleem is en hoe vaak het voorkomt."
+                ],
+                options: [
+                    { text: "Valkuil 1: Een niet bestaand probleem", correct: true },
+                    { text: "Valkuil 2: Het verkeerde gedrag", correct: false },
+                    { text: "Valkuil 3: De verkeerde gedragsdeterminanten", correct: false },
+                    { text: "Valkuil 4: De verkeerde interventie", correct: false }
+                ],
+                explanation: "Dit scenario illustreert <strong>Valkuil 1: Een niet bestaand probleem</strong>. Deze valkuil treedt op wanneer een project wordt ontwikkeld voor een probleem dat bij nader inzien nauwelijks bestaat of niet ernstig is."
+            },
+            {
+                question: "Een gezondheidsbevorderingsprogramma wil de fysieke activiteit onder kantoormedewerkers verhogen door hen informatieflyers te geven over de voordelen van bewegen. De belangrijkste reden waarom medewerkers inactief zijn, is echter het gebrek aan douchefaciliteiten op het werk en inflexibele pauzetijden. Welke 'valkuil' is hier het meest relevant?",
+                studyMaterial: [
+                    "Valkuil 4: de verkeerde interventie",
+                    "Het komt zeker voor dat de keuze voor een soort interventie niet past bij het onderliggende probleem en determinanten:",
+                    "> bijv. het geven van voorlichtingen terwijl voorzieningen of regelgevingen geschikter zijn.",
+                    "Maar gedrag kan ook op andere manieren worden beïnvloed, bijvoorbeeld door wetgeving of door het organiseren van voorzieningen.",
+                    "voorzieningen: proberen we gezond gedrag gemakkelijker te maken."
+                ],
+                options: [
+                    { text: "Valkuil 1: Een niet bestaand probleem", correct: false },
+                    { text: "Valkuil 3: De verkeerde gedragsdeterminanten", correct: false },
+                    { text: "Valkuil 4: De verkeerde interventie", correct: true },
+                    { text: "Valkuil 5: De verkeerde implementatie", correct: false }
+                ],
+                explanation: "Dit is <strong>Valkuil 4: de verkeerde interventie</strong>. De gekozen interventie (informatieflyers) pakt niet de daadwerkelijke barrières aan (gebrek aan voorzieningen, beperkend beleid). In dit geval zouden 'voorzieningen' (zoals douches) of aanpassing van 'regelgeving' (zoals pauzebeleid) waarschijnlijk effectiever zijn dan alleen 'voorlichting'."
+            },
+            {
+                question: "Een persoon wil beginnen met sporten. Hij/zij gelooft dat sporten ervoor zal zorgen dat hij/zij zich energieker voelt en zijn/haar humeur zal verbeteren. Welk type 'beliefs' beïnvloeden volgens Brug (2017) voornamelijk zijn/haar attitude in dit specifieke geval?",
+                studyMaterial: [
+                    "Uitkomstverwachtingen (outcome expectations): de specifieke voor- en nadelen die mensen koppelen aan een bepaald gedrag.",
+                    "Een andere indeling die hieraan gerelateerd is: 1. instrumentale beliefs: over gedrag als middel > inschatting van de gevolgen of consequenties van bewegen (je blijft gezond) 2. experientiële beliefs: over gedrag als ervaring  > Of doordat bewegen op zichzelf een bepaalde ervaringswaarde heeft (bewegen is prettig)",
+                    "affectieve beliefs: meer gerelateerd aan gevoel en emotie (bewegen is plezierig)"
+                ],
+                options: [
+                    { text: "Cognitieve beliefs", correct: false },
+                    { text: "Instrumentale beliefs", correct: false },
+                    { text: "Experiëntiële en affectieve beliefs", correct: true },
+                    { text: "Conatieve beliefs", correct: false }
+                ],
+                explanation: "Dit zijn voornamelijk <strong>experiëntiële beliefs</strong> (ervaringsgerelateerde overtuigingen) en mogelijk <strong>affectieve beliefs</strong> (gevoelsgerelateerde overtuigingen). Experiëntiële beliefs hebben betrekking op de ervaring van het gedrag zelf, zoals je energieker voelen of dat sporten prettig is. Affectieve beliefs zijn gerelateerd aan gevoelens en emoties, zoals een verbeterd humeur door sporten."
+            },
+            {
+                question: "Een student probeert gezonder te eten op de universiteit. De universiteitskantine biedt echter voornamelijk ongezonde, calorierijke maaltijden aan, en vers fruit is duur en moeilijk te vinden op de campus. Welk *type* en *niveau* van omgevingsdeterminant zijn hier volgens de classificatie van Brug (2017) het duidelijkst in het spel?",
+                studyMaterial: [
+                    "Omgevingsdeterminanten: een factor die als externe stimulus kan dienen om het gedrag van een individu te bepalen.",
+                    "Type omgevingsdeterminanten: 1. fysieke omgeving: De fysieke omgeving verwijst naar de beschikbaarheid van middelen of mogelijkheden om gezond of ongezond gedrag te vertonen. > de aan- of afwezigheid van verkooppunten van condooms > de beschikbaarheid van fruit in huis",
+                    "3. economische omgeving: de economische omgeving betreft de kosten die gerelateerd zijn aan gezond en ongezond gedrag. > kosten van sigaretten, alcohol, zonnebrandcrème en kant- en klaar maaltijden",
+                    "Niveaus omgevingsdeterminanten... 1. microniveau: de omgeving op microniveau is de meest proximale omgevingsfactor en wordt vaak aangeduid met de term behavioral setting. Dit verwijst naar de specifieke plek waar het gedrag wordt uitgevoerd, zoals de school, de werkplek of het sportveld."
+                ],
+                options: [
+                    { text: "Type: Sociale omgeving, Niveau: Mesoniveau", correct: false },
+                    { text: "Type: Fysieke en Economische omgeving, Niveau: Microniveau", correct: true },
+                    { text: "Type: Politieke omgeving, Niveau: Macroniveau", correct: false },
+                    { text: "Type: Fysieke omgeving, Niveau: Macroniveau", correct: false }
+                ],
+                explanation: "De typen omgevingsdeterminanten die hier het duidelijkst spelen zijn de <strong>fysieke omgeving</strong> (door het gebrek aan beschikbaarheid van gezonde opties en vers fruit) en de <strong>economische omgeving</strong> (door de hoge kosten van fruit). Het niveau is het <strong>microniveau</strong>, aangezien het verwijst naar de directe gedragssetting – de universiteitscampus en de kantine waar het eetgedrag plaatsvindt."
+            },
+            {
+                question: "In het MOVES-model, na het identificeren van de gewenste uitkomsten en context (Fase 1), en het identificeren van factoren die gedrag beïnvloeden (Fase 2 & 3), wat is de primaire focus van Fase 4, en welke 'valkuil(en)' van Brug (2017) helpt deze fase specifiek te voorkomen?",
+                studyMaterial: [
+                    "Fase 4: rangschikken factoren Welke factoren zijn het meest relevant? Hoe vertalen naar de praktijk?",
+                    "Wat zijn de meest belangrijkste en relevante factoren/ determinanten",
+                    "Rangschikking van de factoren of determinanten die voor onze doelgroep het meest belangrijk, veranderbaar en haalbaar zijn.",
+                    "Valkuil 4 probeer je te voorkomen in fase 4 Valkuil 4: de verkeerde interventie",
+                    "Valkuil 3 probeer je te voorkomen in fase 2/3 of 4 Valkuil 3: de verkeerde gedragsdeterminanten"
+                ],
+                options: [
+                    { text: "Focus: Interventie-implementatie; Voorkomt: Valkuil 5", correct: false },
+                    { text: "Focus: Evaluatie van het proces; Voorkomt: Valkuil 6", correct: false },
+                    { text: "Focus: Rangschikken van factoren (determinanten) op relevantie en veranderbaarheid; Voorkomt: Valkuil 3 & 4", correct: true },
+                    { text: "Focus: Analyse van het gezondheidsprobleem; Voorkomt: Valkuil 1", correct: false }
+                ],
+                explanation: "De primaire focus van <strong>Fase 4: rangschikken factoren</strong> is het bepalen welke geïdentificeerde individuele en omgevingsfactoren (determinanten) het meest belangrijk, relevant, veranderbaar en haalbaar zijn om aan te pakken voor de specifieke doelgroep. Deze fase helpt deze geprioriteerde factoren te vertalen naar praktische interventiedoelen. Deze fase helpt <strong>Valkuil 3: de verkeerde gedragsdeterminanten</strong> te voorkomen (door focus op relevante determinanten) en direct <strong>Valkuil 4: de verkeerde interventie</strong> (door te zorgen dat de interventiestrategie gebaseerd is op deze geprioriteerde, relevante determinanten)."
+            },
+            {
+                question: "Wat zijn de twee belangrijkste evaluatiefasen in het MOVES-model (Fase 7 en Fase 8), en wat beoogt elke fase te beoordelen?",
+                studyMaterial: [
+                    "Fase 7: Evaluatieproces Is beïnvloeding van factoren gelukt zoals beoogd?",
+                    "Evalueren of het gelukt is om de factoren die we in fase 4 hebben genoemd als relevant om te kijken of het ons gelukt is om deze factoren ook echt te veranderen.",
+                    "Fase 8: Evaluatie product Heeft interventie bijgedragen aan behalen gewenste uitkomsten? Is het probleemgedrag veranderd?",
+                    "hebben de aanpassingen in de omgeving of die aanpassingen als individuele factoren er nu daadwerkelijk voor gezorgd dat kinderen meer fysiek actief zijn geweest of hun sedentair gedrag hebben verminderd?"
+                ],
+                options: [
+                    { text: "Fase 7: Effectevaluatie, Fase 8: Implementatie-evaluatie", correct: false },
+                    { text: "Fase 7: Evaluatie van het proces (factorverandering), Fase 8: Evaluatie van het product (gedragsverandering/uitkomst)", correct: true },
+                    { text: "Fase 7: Behoefteanalyse, Fase 8: Kosten-batenanalyse", correct: false },
+                    { text: "Fase 7: Contextanalyse, Fase 8: Duurzaamheidsevaluatie", correct: false }
+                ],
+                explanation: "De twee belangrijkste evaluatiefasen zijn: 1. <strong>Fase 7: Evaluatieproces</strong>: Deze fase beoordeelt of de interventie erin geslaagd is de beoogde factoren (determinanten) te beïnvloeden zoals bedoeld. Er wordt gekeken of de gekozen factoren die in Fase 4 als relevant zijn aangemerkt, daadwerkelijk zijn veranderd. 2. <strong>Fase 8: Evaluatie product</strong>: Deze fase beoordeelt of de interventie heeft bijgedragen aan het behalen van de gewenste uitkomsten, specifiek of het problematische gedrag zelf is veranderd (bijv. toegenomen fysieke activiteit of verminderd sedentair gedrag)."
+            },
+            {
+                question: "Van Kann et al. (2020) benadrukken dat het simpelweg implementeren van geïsoleerde beweeginitiatieven vaak niet voldoende is. Wat wordt bedoeld met een 'Multi-component' aanpak voor beweegstimulering op scholen, en wat is een voorbeeld van een van de componenten?",
+                studyMaterial: [
+                    "Voor succesvolle beweegstimulering op scholen zijn drie essentiële kenmerken geïdentificeerd.",
+                    "1. Multi-component: wil zeggen dat de beweegstimulering zich op meerdere componenten richt.",
+                    "> bewegingsonderwijs > bewegen tijdens schooltijd > bewegen voor en na schooltijd > betrokkenheid van schoolpersoneel > verbonden & betrokkenheid met ouders en buurt"
+                ],
+                options: [
+                    { text: "Een aanpak die zich richt op één zeer effectieve component; Voorbeeld: Alleen extra gymlessen.", correct: false },
+                    { text: "Een aanpak die zich op meerdere componenten tegelijk richt; Voorbeeld: Bewegen tijdens de les, naschoolse sport en ouderbetrokkenheid.", correct: true },
+                    { text: "Een aanpak die door meerdere personen wordt uitgevoerd; Voorbeeld: Meerdere gymleraren.", correct: false },
+                    { text: "Een aanpak die zich richt op competitieve sporten; Voorbeeld: Schoolsporttoernooien.", correct: false }
+                ],
+                explanation: "Een <strong>Multi-component</strong> aanpak betekent dat beweegstimulering zich op meerdere verschillende gebieden of aspecten tegelijk richt, in plaats van slechts op één. Voorbeelden van componenten zijn: bewegingsonderwijs, bewegen tijdens schooltijd, bewegen voor en na schooltijd, betrokkenheid van schoolpersoneel, en verbondenheid & betrokkenheid met ouders en de buurt."
+            },
+            {
+                question: "Wat is volgens het onderzoek van Vos (2020) een belangrijke bevinding met betrekking tot de dagelijkse hoeveelheid matig-tot-zware fysieke activiteit (MVPA) wanneer leerlingen overstappen van de basisschool (PO) naar het voortgezet onderwijs (VO)? En, welk percentage van hun MVPA op een schooldag vond 'na schooltijd' plaats, gebaseerd op de tabelgegevens voor groep 8 leerlingen?",
+                studyMaterial: [
+                    "Leerlingen in het voortgezet onderwijs zijn over het algemeen minder actief dan basisschoolleerlingen.",
+                    "Wanneer ze de overstap maken naar het voortgezet onderwijs, is er een aanzienlijke afname van hun dagelijkse matig-tot-zware fysieke activiteit, zowel op schooldagen als in het weekend.",
+                    "Tabel data voor 'Matig-tot-zware activiteit': '- Reguliere schooldag, Gemiddeld 43.9 minuten (SD=32.3) - Na schooltijd, 63% van de totale activiteit'"
+                ],
+                options: [
+                    { text: "Toename in MVPA; 50% na schooltijd.", correct: false },
+                    { text: "Geen significante verandering in MVPA; 75% na schooltijd.", correct: false },
+                    { text: "Aanzienlijke afname in MVPA; 63% na schooltijd.", correct: true },
+                    { text: "Lichte toename in MVPA; 40% na schooltijd.", correct: false }
+                ],
+                explanation: "Een belangrijke bevinding is dat er een <strong>aanzienlijke afname</strong> is in de dagelijkse matig-tot-zware fysieke activiteit (MVPA) bij leerlingen wanneer zij de overstap maken van het basis- naar het voortgezet onderwijs, waargenomen op zowel schooldagen als in het weekend. Volgens de tabelgegevens voor groep 8 leerlingen (vóór de overstap) vond <strong>63%</strong> van hun totale MVPA op een reguliere schooldag 'na schooltijd' plaats."
+            },
+            {
+                question: "Wat was een primaire reden, geïdentificeerd in het 'Interview shuffle sport', die traditioneel sportaanbod onaantrekkelijk maakt voor veel niet-sportende VMBO-leerlingen, en hoe probeert het kernconcept van ShuffleSports dit aan te pakken?",
+                studyMaterial: [
+                    "Vooral onder de vmbo’ers is het percentage niet-sporters schrikbarend hoog.",
+                    "de huidige sportaanbod wordt geassocieerd met prestatie, terwijl deze jongens sporten voor de gezelligheid en om iets te doen met hun vrienden",
+                    "Door twee bestaande sporten te mixen- zonder ze te matchen, creëren we een nieuwe sport die nog nooit iemand heeft gedaan.",
+                    "Een sportactiviteit waarbij het niet gaat om je de sport kan, maar over samen plezier maken en jezelf uitdagen.",
+                    "> Gezelligheid & plezier > geen competitief imago > Lager instapniveau"
+                ],
+                options: [
+                    { text: "Reden: Te weinig keuzevrijheid; Aanpak: Meer sportopties aanbieden.", correct: false },
+                    { text: "Reden: Associatie met prestatie/vaardigheid; Aanpak: Een nieuwe, onbekende sport creëren waar plezier en lage drempel centraal staan.", correct: true },
+                    { text: "Reden: Te hoge kosten; Aanpak: Gratis sportactiviteiten.", correct: false },
+                    { text: "Reden: Gebrek aan goede faciliteiten; Aanpak: Investeren in nieuwe sportcomplexen.", correct: false }
+                ],
+                explanation: "Een primaire reden waarom traditionele sport onaantrekkelijk is, is dat het vaak <strong>geassocieerd wordt met prestatie en vaardigheid</strong>, terwijl deze leerlingen meer geïnteresseerd zijn in <strong>gezelligheid, plezier en iets doen met vrienden</strong>. ShuffleSports probeert dit aan te pakken door <strong>twee bestaande sporten te mixen om een nieuwe, onbekende sport te creëren</strong>. Het kernidee is dat, aangezien niemand een expert is in deze nieuwe 'geshuffelde' sport, de focus verschuift van vaardigheid en prestatie naar <strong>gedeeld plezier, zelfuitdaging en een lagere instapdrempel</strong>. Dit bevordert 'gezelligheid & plezier' en een 'geen competitief imago'."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        const scoreEl = document.getElementById('score');
+        const questionCounterEl = document.getElementById('question-counter');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const progressBarEl = document.getElementById('progress-bar');
+        
+        const questionTextEl = document.getElementById('question-text');
+        const studyMaterialListEl = document.getElementById('study-material-list');
+        const answersContainerEl = document.getElementById('answers-container');
+        const feedbackContainerEl = document.getElementById('feedback-container');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        
+        const gameAreaEl = document.getElementById('game-area');
+        const endScreenEl = document.getElementById('end-screen');
+        const finalScoreEl = document.getElementById('final-score');
+        const finalMessageEl = document.getElementById('final-message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+            scoreEl.textContent = score;
+            totalQuestionsEl.textContent = questions.length;
+            gameAreaEl.classList.remove('hidden');
+            endScreenEl.classList.add('hidden');
+            nextQuestionBtn.disabled = true;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answerSelected = false;
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            questionTextEl.textContent = currentQuestion.question;
+            questionCounterEl.textContent = currentQuestionIndex + 1;
+            
+            // Update progress bar
+            const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBarEl.style.width = `${progressPercentage}%`;
+
+            studyMaterialListEl.innerHTML = '';
+            currentQuestion.studyMaterial.forEach(material => {
+                const li = document.createElement('li');
+                li.textContent = material;
+                studyMaterialListEl.appendChild(li);
+            });
+
+            answersContainerEl.innerHTML = '';
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.classList.add('answer-btn', 'w-full', 'bg-indigo-500', 'hover:bg-indigo-600', 'text-white', 'font-semibold', 'py-3', 'px-4', 'rounded-lg', 'border', 'border-indigo-700', 'shadow');
+                button.onclick = () => selectAnswer(button, option.correct, currentQuestion.explanation);
+                answersContainerEl.appendChild(button);
+            });
+
+            feedbackContainerEl.innerHTML = '';
+            feedbackContainerEl.className = 'p-4 rounded-lg min-h-[50px] mb-6'; // Reset classes
+            nextQuestionBtn.disabled = true;
+             if (currentQuestionIndex === questions.length - 1) {
+                nextQuestionBtn.textContent = 'Bekijk Resultaten';
+            } else {
+                nextQuestionBtn.textContent = 'Volgende Vraag';
+            }
+        }
+
+        function selectAnswer(button, isCorrect, explanation) {
+            if (answerSelected) return; // Prevent multiple selections
+            answerSelected = true;
+
+            // Disable all answer buttons
+            Array.from(answersContainerEl.children).forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            if (isCorrect) {
+                score += 10;
+                scoreEl.textContent = score;
+                button.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                button.classList.add('selected-correct');
+                feedbackContainerEl.innerHTML = `<p class="font-semibold">Correct!</p><p class="text-sm">${explanation}</p>`;
+                feedbackContainerEl.className = 'p-4 rounded-lg feedback-correct mb-6';
+            } else {
+                button.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                button.classList.add('selected-incorrect');
+                feedbackContainerEl.innerHTML = `<p class="font-semibold">Helaas, dat is niet correct.</p><p class="text-sm">${explanation}</p>`;
+                feedbackContainerEl.className = 'p-4 rounded-lg feedback-incorrect mb-6';
+
+                // Highlight the correct answer
+                const correctButton = Array.from(answersContainerEl.children).find((btn, index) => questions[currentQuestionIndex].options[index].correct);
+                if (correctButton) {
+                    correctButton.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                    correctButton.classList.add('selected-correct');
+                }
+            }
+            nextQuestionBtn.disabled = false;
+        }
+
+        nextQuestionBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showEndScreen();
+            }
+        });
+
+        restartBtn.addEventListener('click', startGame);
+
+        function showEndScreen() {
+            gameAreaEl.classList.add('hidden');
+            endScreenEl.classList.remove('hidden');
+            finalScoreEl.textContent = score;
+
+            let message = '';
+            const percentage = (score / (questions.length * 10)) * 100;
+            if (percentage >= 90) {
+                message = "Uitstekend! Je hebt een zeer goede kennis van de stof!";
+            } else if (percentage >= 70) {
+                message = "Goed gedaan! Je bent goed op weg.";
+            } else if (percentage >= 50) {
+                message = "Redelijk, maar er is ruimte voor verbetering. Bestudeer de stof nog eens goed.";
+            } else {
+                message = "Blijf oefenen! Herhaal de stof om je kennis te verbeteren.";
+            }
+            finalMessageEl.textContent = message;
+        }
+
+        // Start the game on load
+        startGame();
+    </script>
+</body>
+</html>
