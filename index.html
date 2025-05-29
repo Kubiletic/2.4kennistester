@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kennis Challenge: Gezondheidsbevordering</title>
+    <title>Kennis Challenge & Samenvatting App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
+            background-color: #f3f4f6; /* Light gray background for the whole page */
+        }
+        .main-container {
+             background-color: #f3f4f6; /* Light gray background */
+        }
+        .content-section {
+            background-color: #ffffff; /* White background for content */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.75rem; /* rounded-xl */
         }
         .study-material-box {
             background-color: #eef2ff; /* Light indigo background */
@@ -28,7 +36,7 @@
         .answer-btn {
             transition: background-color 0.3s ease, transform 0.1s ease;
         }
-        .answer-btn:hover {
+        .answer-btn:hover:not(:disabled) {
             background-color: #e0e7ff; /* Lighter indigo on hover */
         }
         .answer-btn.selected-correct {
@@ -55,57 +63,117 @@
             height: 100%;
             transition: width 0.5s ease-in-out;
         }
+        .nav-btn {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .nav-btn.active {
+            background-color: #4f46e5; /* Indigo-600 */
+            color: white;
+        }
+        .nav-btn:not(.active):hover {
+            background-color: #e0e7ff; /* Lighter indigo on hover */
+        }
+        .summary-content-text {
+            white-space: pre-line; /* Preserve line breaks from the text */
+            line-height: 1.6;
+        }
+        .summary-content-text h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #374151; /* Gray-700 */
+        }
+         .summary-content-text h4 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-top: 0.75rem;
+            margin-bottom: 0.25rem;
+            color: #4b5563; /* Gray-600 */
+        }
+        .summary-content-text p {
+            margin-bottom: 0.75rem;
+        }
+        .summary-content-text ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .summary-content-text li {
+            margin-bottom: 0.25rem;
+        }
+        .toc-link.active {
+            background-color: #ddd6fe; /* Violet-200 */
+            color: #5b21b6; /* Violet-700 */
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 to-slate-700 text-slate-100">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 main-container">
 
-    <div class="w-full max-w-3xl bg-slate-800 shadow-2xl rounded-xl p-6 md:p-10">
-        <header class="mb-6 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Kennis Challenge!</h1>
-            <p class="text-slate-400 mt-1">Test je kennis over Gezondheidsbevordering</p>
-        </header>
+    <div class="w-full max-w-4xl">
+        <nav class="mb-6 flex flex-wrap justify-center gap-2 p-2 bg-slate-200 rounded-lg shadow">
+            <button data-target="game-page" class="nav-btn active flex-grow sm:flex-grow-0 text-slate-700 font-semibold py-2 px-4 rounded-md">Kennis Challenge</button>
+            <button data-target="summary-by-parts-page" class="nav-btn flex-grow sm:flex-grow-0 text-slate-700 font-semibold py-2 px-4 rounded-md">Samenvatting per Onderdeel</button>
+            <button data-target="full-summary-page" class="nav-btn flex-grow sm:flex-grow-0 text-slate-700 font-semibold py-2 px-4 rounded-md">Complete Samenvatting</button>
+        </nav>
 
-        <div id="game-area">
-            <div class="flex justify-between items-center mb-6">
-                <p class="text-lg font-semibold">Score: <span id="score" class="text-yellow-400">0</span></p>
-                <p class="text-sm text-slate-400">Vraag <span id="question-counter">1</span> van <span id="total-questions">0</span></p>
-            </div>
-            <div class="progress-bar-container w-full h-2.5 mb-6">
-                <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
-            </div>
-
-            <div id="question-container" class="mb-6">
-                <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-4 text-slate-100">Vraag wordt geladen...</h2>
-            </div>
-
-            <div id="study-material-container" class="mb-6 p-4 study-material-box rounded-lg shadow">
-                <h3 class="text-md font-semibold mb-2 text-indigo-700">Relevante Studiestof:</h3>
-                <ul id="study-material-list" class="list-disc list-inside text-sm text-indigo-600 space-y-1">
-                    </ul>
-            </div>
-
-            <div id="answers-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+        <div id="game-page" class="content-section p-6 md:p-10">
+            <header class="mb-6 text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Kennis Challenge!</h1>
+                <p class="text-slate-600 mt-1">Test je kennis over Gezondheidsbevordering</p>
+            </header>
+            <div id="game-area">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-lg font-semibold text-slate-700">Score: <span id="score" class="text-yellow-500">0</span></p>
+                    <p class="text-sm text-slate-500">Vraag <span id="question-counter">1</span> van <span id="total-questions">0</span></p>
                 </div>
-
-            <div id="feedback-container" class="p-4 rounded-lg min-h-[50px] mb-6" role="alert" aria-live="polite">
+                <div class="progress-bar-container w-full h-2.5 mb-6">
+                    <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
                 </div>
-
-            <button id="next-question-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
-                Volgende Vraag
-            </button>
+                <div id="question-container" class="mb-6">
+                    <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-4 text-slate-800">Vraag wordt geladen...</h2>
+                </div>
+                <div id="study-material-container" class="mb-6 p-4 study-material-box rounded-lg shadow">
+                    <h3 class="text-md font-semibold mb-2 text-indigo-700">Relevante Studiestof:</h3>
+                    <ul id="study-material-list" class="list-disc list-inside text-sm text-indigo-600 space-y-1"></ul>
+                </div>
+                <div id="answers-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6"></div>
+                <div id="feedback-container" class="p-4 rounded-lg min-h-[50px] mb-6" role="alert" aria-live="polite"></div>
+                <button id="next-question-btn" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                    Volgende Vraag
+                </button>
+            </div>
+            <div id="end-screen" class="hidden text-center">
+                <h2 class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Spel Voorbij!</h2>
+                <p class="text-xl mb-2 text-slate-700">Je eindscore is: <span id="final-score" class="font-bold text-yellow-500">0</span></p>
+                <p id="final-message" class="text-lg mb-6 text-slate-600"></p>
+                <button id="restart-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-150 ease-in-out">
+                    Opnieuw Spelen
+                </button>
+            </div>
         </div>
 
-        <div id="end-screen" class="hidden text-center">
-            <h2 class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Spel Voorbij!</h2>
-            <p class="text-xl mb-2">Je eindscore is: <span id="final-score" class="font-bold text-yellow-400">0</span></p>
-            <p id="final-message" class="text-lg mb-6 text-slate-300"></p>
-            <button id="restart-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-150 ease-in-out">
-                Opnieuw Spelen
-            </button>
+        <div id="summary-by-parts-page" class="content-section p-6 md:p-10 hidden">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-slate-800">Samenvatting per Onderdeel</h2>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div id="toc-summary-container" class="md:w-1/3 space-y-2">
+                    </div>
+                <div id="summary-part-content-display" class="md:w-2/3 p-4 bg-slate-50 rounded-lg shadow summary-content-text text-slate-700 min-h-[300px]">
+                    Selecteer een onderdeel uit de inhoudsopgave.
+                </div>
+            </div>
+        </div>
+
+        <div id="full-summary-page" class="content-section p-6 md:p-10 hidden">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-slate-800">Complete Samenvatting</h2>
+            <div id="full-summary-content" class="summary-content-text text-slate-700">
+                </div>
         </div>
     </div>
 
     <script>
+        // --- Start Game Logic (licht aangepast voor integratie) ---
         const questions = [
             {
                 question: "Een landelijke campagne heeft als doel te voorkomen dat mensen diabetes type 2 ontwikkelen, door het promoten van gezonde voeding en regelmatige lichaamsbeweging onder de algemene bevolking. Welk specifiek type preventie is dit volgens Brug (2017)?",
@@ -114,174 +182,72 @@
                     "Primaire preventie: richten we ons op het voorkomen van een gezondheidsprobleem door het wegnemen van oorzaken of risicofactoren voor aandoeningen.",
                     "Voorbeeld: > preventie van hart- en vaatziekten door stoppen met roken maatregelen > Een medische vorm van primaire ziekte­ preventie is vaccinatie"
                 ],
-                options: [
-                    { text: "Primaire preventie", correct: true },
-                    { text: "Secundaire preventie", correct: false },
-                    { text: "Tertiaire preventie", correct: false },
-                    { text: "Geïndiceerde preventie", correct: false }
-                ],
-                explanation: "Dit is een voorbeeld van <strong>primaire preventie</strong>. Primaire preventie heeft als doel een gezondheidsprobleem te voorkomen door oorzaken of risicofactoren weg te nemen. Het promoten van gezonde voeding en lichaamsbeweging om diabetes te voorkomen past binnen deze definitie."
+                options: [ { text: "Primaire preventie", correct: true }, { text: "Secundaire preventie", correct: false }, { text: "Tertiaire preventie", correct: false }, { text: "Geïndiceerde preventie", correct: false } ],
+                explanation: "Dit is een voorbeeld van <strong>primaire preventie</strong>. Primaire preventie heeft als doel een gezondheidsprobleem te voorkomen door oorzaken of risicofactoren weg te nemen."
             },
             {
                 question: "Een gezondheidsprogramma richt zich specifiek op personen bij wie via screening pre-diabetes is vastgesteld. Het programma wil hen interventies aanbieden om progressie naar volledige diabetes te voorkomen. Onder welke categorie van preventie, volgens het onderscheid tussen universele, selectieve, geïndiceerde en zorggerelateerde preventie, valt dit?",
                 studyMaterial: [
                     "Tegenwoordig wordt vaker het onderscheid gemaakt tussen universele, selectieve, geïndiceerde en zorggerelateerde preventie:",
-                    "Selectieve preventie: is gericht op bevolkingsgroepen met een verhoogd risico en heeft als doel de gezondheid van specifieke risicogroepen te verbeteren -> secundaire prev.",
-                    "Omdat de preventie wordt aangeboden op basis van screening op een risicofactor",
-                    "Geïndiceerde preventie: richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen.",
-                    "Als doel het ontstaan van ziekte of verdere gezondheidsschade te voorkomen -> secundaire preventie en hoogrisicobenadering"
+                    "Selectieve preventie: is gericht op bevolkingsgroepen met een verhoogd risico...",
+                    "Geïndiceerde preventie: richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen."
                 ],
-                options: [
-                    { text: "Universele preventie", correct: false },
-                    { text: "Selectieve preventie", correct: false },
-                    { text: "Geïndiceerde preventie", correct: true },
-                    { text: "Zorggerelateerde preventie", correct: false }
-                ],
-                explanation: "Dit valt onder <strong>geïndiceerde preventie</strong>. Geïndiceerde preventie richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen (zoals pre-diabetes) vertonen. Het doel is het ontstaan van de ziekte of verdere gezondheidsschade te voorkomen."
+                options: [ { text: "Universele preventie", correct: false }, { text: "Selectieve preventie", correct: false }, { text: "Geïndiceerde preventie", correct: true }, { text: "Zorggerelateerde preventie", correct: false } ],
+                explanation: "Dit valt onder <strong>geïndiceerde preventie</strong>. Geïndiceerde preventie richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen (zoals pre-diabetes) vertonen."
+            },
+             {
+                question: "Een school lanceert een uitgebreide anti-pestcampagne. Later blijkt echter uit data dat pestincidenten op school al extreem laag waren. Welke van Brug's (2017) 'valkuilen' illustreert dit scenario het beste?",
+                studyMaterial: [ "Valkuil 1: Een niet bestaand probleem", "Soms kan het gebeuren dat er een project wordt ontwikkeld voor een probleem dat bij nader inzien niet of nauwelijks bestaat." ],
+                options: [ { text: "Valkuil 1: Een niet bestaand probleem", correct: true }, { text: "Valkuil 2: Het verkeerde gedrag", correct: false }, { text: "Valkuil 3: De verkeerde gedragsdeterminanten", correct: false }, { text: "Valkuil 4: De verkeerde interventie", correct: false } ],
+                explanation: "Dit scenario illustreert <strong>Valkuil 1: Een niet bestaand probleem</strong>."
             },
             {
-                question: "Een school lanceert een uitgebreide anti-pestcampagne. Later blijkt echter uit data dat pestincidenten op school al extreem laag waren en niet als een significant probleem werden beschouwd door leerlingen of personeel. Welke van Brug's (2017) 'valkuilen' illustreert dit scenario het beste?",
-                studyMaterial: [
-                    "Hoe belangrijk het gebruik van het model is, willen we illustreren met een aantal veelvoorkomende valkuilen.",
-                    "Valkuil 1: Een niet bestaand probleem",
-                    "Soms kan het gebeuren dat er een project wordt ontwikkeld voor een probleem dat bij nader inzien niet of nauwelijks bestaat.",
-                    "Het is en blijft essentieel om altijd goed na te gaan hoe ernstig een gezondheidsprobleem is en hoe vaak het voorkomt."
-                ],
-                options: [
-                    { text: "Valkuil 1: Een niet bestaand probleem", correct: true },
-                    { text: "Valkuil 2: Het verkeerde gedrag", correct: false },
-                    { text: "Valkuil 3: De verkeerde gedragsdeterminanten", correct: false },
-                    { text: "Valkuil 4: De verkeerde interventie", correct: false }
-                ],
-                explanation: "Dit scenario illustreert <strong>Valkuil 1: Een niet bestaand probleem</strong>. Deze valkuil treedt op wanneer een project wordt ontwikkeld voor een probleem dat bij nader inzien nauwelijks bestaat of niet ernstig is."
+                question: "Een programma geeft kantoormedewerkers flyers over bewegen, maar ze zijn inactief door gebrek aan douches en inflexibele pauzes. Welke 'valkuil' is hier relevant?",
+                studyMaterial: [ "Valkuil 4: de verkeerde interventie", "Het komt zeker voor dat de keuze voor een soort interventie niet past bij het onderliggende probleem en determinanten:", "> bijv. het geven van voorlichtingen terwijl voorzieningen of regelgevingen geschikter zijn." ],
+                options: [ { text: "Valkuil 1", correct: false }, { text: "Valkuil 3", correct: false }, { text: "Valkuil 4: De verkeerde interventie", correct: true }, { text: "Valkuil 5", correct: false } ],
+                explanation: "Dit is <strong>Valkuil 4: de verkeerde interventie</strong>. De gekozen interventie (flyers) pakt niet de daadwerkelijke barrières aan."
             },
             {
-                question: "Een gezondheidsbevorderingsprogramma wil de fysieke activiteit onder kantoormedewerkers verhogen door hen informatieflyers te geven over de voordelen van bewegen. De belangrijkste reden waarom medewerkers inactief zijn, is echter het gebrek aan douchefaciliteiten op het werk en inflexibele pauzetijden. Welke 'valkuil' is hier het meest relevant?",
-                studyMaterial: [
-                    "Valkuil 4: de verkeerde interventie",
-                    "Het komt zeker voor dat de keuze voor een soort interventie niet past bij het onderliggende probleem en determinanten:",
-                    "> bijv. het geven van voorlichtingen terwijl voorzieningen of regelgevingen geschikter zijn.",
-                    "Maar gedrag kan ook op andere manieren worden beïnvloed, bijvoorbeeld door wetgeving of door het organiseren van voorzieningen.",
-                    "voorzieningen: proberen we gezond gedrag gemakkelijker te maken."
-                ],
-                options: [
-                    { text: "Valkuil 1: Een niet bestaand probleem", correct: false },
-                    { text: "Valkuil 3: De verkeerde gedragsdeterminanten", correct: false },
-                    { text: "Valkuil 4: De verkeerde interventie", correct: true },
-                    { text: "Valkuil 5: De verkeerde implementatie", correct: false }
-                ],
-                explanation: "Dit is <strong>Valkuil 4: de verkeerde interventie</strong>. De gekozen interventie (informatieflyers) pakt niet de daadwerkelijke barrières aan (gebrek aan voorzieningen, beperkend beleid). In dit geval zouden 'voorzieningen' (zoals douches) of aanpassing van 'regelgeving' (zoals pauzebeleid) waarschijnlijk effectiever zijn dan alleen 'voorlichting'."
+                question: "Iemand wil sporten voor meer energie en beter humeur. Welk type 'beliefs' (Brug, 2017) beïnvloeden hier de attitude?",
+                studyMaterial: [ "Uitkomstverwachtingen (outcome expectations): de specifieke voor- en nadelen die mensen koppelen aan een bepaald gedrag.", "experiëntiële beliefs: over gedrag als ervaring (bewegen is prettig)", "affectieve beliefs: meer gerelateerd aan gevoel en emotie (bewegen is plezierig)" ],
+                options: [ { text: "Cognitieve beliefs", correct: false }, { text: "Instrumentale beliefs", correct: false }, { text: "Experiëntiële en affectieve beliefs", correct: true }, { text: "Conatieve beliefs", correct: false } ],
+                explanation: "Dit zijn voornamelijk <strong>experiëntiële beliefs</strong> en mogelijk <strong>affectieve beliefs</strong>, gericht op de ervaring en gevoelens."
             },
             {
-                question: "Een persoon wil beginnen met sporten. Hij/zij gelooft dat sporten ervoor zal zorgen dat hij/zij zich energieker voelt en zijn/haar humeur zal verbeteren. Welk type 'beliefs' beïnvloeden volgens Brug (2017) voornamelijk zijn/haar attitude in dit specifieke geval?",
-                studyMaterial: [
-                    "Uitkomstverwachtingen (outcome expectations): de specifieke voor- en nadelen die mensen koppelen aan een bepaald gedrag.",
-                    "Een andere indeling die hieraan gerelateerd is: 1. instrumentale beliefs: over gedrag als middel > inschatting van de gevolgen of consequenties van bewegen (je blijft gezond) 2. experientiële beliefs: over gedrag als ervaring  > Of doordat bewegen op zichzelf een bepaalde ervaringswaarde heeft (bewegen is prettig)",
-                    "affectieve beliefs: meer gerelateerd aan gevoel en emotie (bewegen is plezierig)"
-                ],
-                options: [
-                    { text: "Cognitieve beliefs", correct: false },
-                    { text: "Instrumentale beliefs", correct: false },
-                    { text: "Experiëntiële en affectieve beliefs", correct: true },
-                    { text: "Conatieve beliefs", correct: false }
-                ],
-                explanation: "Dit zijn voornamelijk <strong>experiëntiële beliefs</strong> (ervaringsgerelateerde overtuigingen) en mogelijk <strong>affectieve beliefs</strong> (gevoelsgerelateerde overtuigingen). Experiëntiële beliefs hebben betrekking op de ervaring van het gedrag zelf, zoals je energieker voelen of dat sporten prettig is. Affectieve beliefs zijn gerelateerd aan gevoelens en emoties, zoals een verbeterd humeur door sporten."
+                question: "Een student wil gezonder eten, maar de kantine biedt ongezonde opties en fruit is duur. Welk *type* en *niveau* van omgevingsdeterminant (Brug, 2017) speelt hier?",
+                studyMaterial: [ "fysieke omgeving: De fysieke omgeving verwijst naar de beschikbaarheid van middelen...", "economische omgeving: de economische omgeving betreft de kosten...", "microniveau: de omgeving op microniveau is de meest proximale omgevingsfactor... zoals de school, de werkplek" ],
+                options: [ { text: "Type: Sociale omgeving, Niveau: Mesoniveau", correct: false }, { text: "Type: Fysieke en Economische omgeving, Niveau: Microniveau", correct: true }, { text: "Type: Politieke omgeving, Niveau: Macroniveau", correct: false }, { text: "Type: Fysieke omgeving, Niveau: Macroniveau", correct: false } ],
+                explanation: "Typen: <strong>fysieke omgeving</strong> (beschikbaarheid) en <strong>economische omgeving</strong> (kosten). Niveau: <strong>microniveau</strong> (directe setting zoals de universiteitskantine)."
             },
             {
-                question: "Een student probeert gezonder te eten op de universiteit. De universiteitskantine biedt echter voornamelijk ongezonde, calorierijke maaltijden aan, en vers fruit is duur en moeilijk te vinden op de campus. Welk *type* en *niveau* van omgevingsdeterminant zijn hier volgens de classificatie van Brug (2017) het duidelijkst in het spel?",
-                studyMaterial: [
-                    "Omgevingsdeterminanten: een factor die als externe stimulus kan dienen om het gedrag van een individu te bepalen.",
-                    "Type omgevingsdeterminanten: 1. fysieke omgeving: De fysieke omgeving verwijst naar de beschikbaarheid van middelen of mogelijkheden om gezond of ongezond gedrag te vertonen. > de aan- of afwezigheid van verkooppunten van condooms > de beschikbaarheid van fruit in huis",
-                    "3. economische omgeving: de economische omgeving betreft de kosten die gerelateerd zijn aan gezond en ongezond gedrag. > kosten van sigaretten, alcohol, zonnebrandcrème en kant- en klaar maaltijden",
-                    "Niveaus omgevingsdeterminanten... 1. microniveau: de omgeving op microniveau is de meest proximale omgevingsfactor en wordt vaak aangeduid met de term behavioral setting. Dit verwijst naar de specifieke plek waar het gedrag wordt uitgevoerd, zoals de school, de werkplek of het sportveld."
-                ],
-                options: [
-                    { text: "Type: Sociale omgeving, Niveau: Mesoniveau", correct: false },
-                    { text: "Type: Fysieke en Economische omgeving, Niveau: Microniveau", correct: true },
-                    { text: "Type: Politieke omgeving, Niveau: Macroniveau", correct: false },
-                    { text: "Type: Fysieke omgeving, Niveau: Macroniveau", correct: false }
-                ],
-                explanation: "De typen omgevingsdeterminanten die hier het duidelijkst spelen zijn de <strong>fysieke omgeving</strong> (door het gebrek aan beschikbaarheid van gezonde opties en vers fruit) en de <strong>economische omgeving</strong> (door de hoge kosten van fruit). Het niveau is het <strong>microniveau</strong>, aangezien het verwijst naar de directe gedragssetting – de universiteitscampus en de kantine waar het eetgedrag plaatsvindt."
+                question: "In het MOVES-model, na Fase 1, 2 & 3, wat is de focus van Fase 4 en welke 'valkuil(en)' van Brug (2017) helpt dit voorkomen?",
+                studyMaterial: [ "Fase 4: rangschikken factoren Welke factoren zijn het meest relevant? Hoe vertalen naar de praktijk?", "Valkuil 4 probeer je te voorkomen in fase 4", "Valkuil 3 probeer je te voorkomen in fase 2/3 of 4" ],
+                options: [ { text: "Focus: Interventie-implementatie; Voorkomt: Valkuil 5", correct: false }, { text: "Focus: Evaluatie proces; Voorkomt: Valkuil 6", correct: false }, { text: "Focus: Rangschikken factoren; Voorkomt: Valkuil 3 & 4", correct: true }, { text: "Focus: Analyse gezondheidsprobleem; Voorkomt: Valkuil 1", correct: false } ],
+                explanation: "Focus Fase 4: <strong>Rangschikken van factoren</strong> (determinanten). Voorkomt <strong>Valkuil 3: de verkeerde gedragsdeterminanten</strong> en <strong>Valkuil 4: de verkeerde interventie</strong>."
             },
             {
-                question: "In het MOVES-model, na het identificeren van de gewenste uitkomsten en context (Fase 1), en het identificeren van factoren die gedrag beïnvloeden (Fase 2 & 3), wat is de primaire focus van Fase 4, en welke 'valkuil(en)' van Brug (2017) helpt deze fase specifiek te voorkomen?",
-                studyMaterial: [
-                    "Fase 4: rangschikken factoren Welke factoren zijn het meest relevant? Hoe vertalen naar de praktijk?",
-                    "Wat zijn de meest belangrijkste en relevante factoren/ determinanten",
-                    "Rangschikking van de factoren of determinanten die voor onze doelgroep het meest belangrijk, veranderbaar en haalbaar zijn.",
-                    "Valkuil 4 probeer je te voorkomen in fase 4 Valkuil 4: de verkeerde interventie",
-                    "Valkuil 3 probeer je te voorkomen in fase 2/3 of 4 Valkuil 3: de verkeerde gedragsdeterminanten"
-                ],
-                options: [
-                    { text: "Focus: Interventie-implementatie; Voorkomt: Valkuil 5", correct: false },
-                    { text: "Focus: Evaluatie van het proces; Voorkomt: Valkuil 6", correct: false },
-                    { text: "Focus: Rangschikken van factoren (determinanten) op relevantie en veranderbaarheid; Voorkomt: Valkuil 3 & 4", correct: true },
-                    { text: "Focus: Analyse van het gezondheidsprobleem; Voorkomt: Valkuil 1", correct: false }
-                ],
-                explanation: "De primaire focus van <strong>Fase 4: rangschikken factoren</strong> is het bepalen welke geïdentificeerde individuele en omgevingsfactoren (determinanten) het meest belangrijk, relevant, veranderbaar en haalbaar zijn om aan te pakken voor de specifieke doelgroep. Deze fase helpt deze geprioriteerde factoren te vertalen naar praktische interventiedoelen. Deze fase helpt <strong>Valkuil 3: de verkeerde gedragsdeterminanten</strong> te voorkomen (door focus op relevante determinanten) en direct <strong>Valkuil 4: de verkeerde interventie</strong> (door te zorgen dat de interventiestrategie gebaseerd is op deze geprioriteerde, relevante determinanten)."
+                question: "Wat zijn de twee belangrijkste evaluatiefasen in het MOVES-model (Fase 7 en Fase 8) en wat beoordelen ze?",
+                studyMaterial: [ "Fase 7: Evaluatieproces Is beïnvloeding van factoren gelukt zoals beoogd?", "Fase 8: Evaluatie product Heeft interventie bijgedragen aan behalen gewenste uitkomsten? Is het probleemgedrag veranderd?" ],
+                options: [ { text: "F7: Effectevaluatie, F8: Implementatie-evaluatie", correct: false }, { text: "F7: Proces (factorverandering), F8: Product (gedragsverandering/uitkomst)", correct: true }, { text: "F7: Behoefteanalyse, F8: Kosten-batenanalyse", correct: false }, { text: "F7: Contextanalyse, F8: Duurzaamheidsevaluatie", correct: false } ],
+                explanation: "<strong>Fase 7: Evaluatieproces</strong> (is beïnvloeding factoren gelukt?). <strong>Fase 8: Evaluatie product</strong> (is probleemgedrag veranderd?)."
             },
             {
-                question: "Wat zijn de twee belangrijkste evaluatiefasen in het MOVES-model (Fase 7 en Fase 8), en wat beoogt elke fase te beoordelen?",
-                studyMaterial: [
-                    "Fase 7: Evaluatieproces Is beïnvloeding van factoren gelukt zoals beoogd?",
-                    "Evalueren of het gelukt is om de factoren die we in fase 4 hebben genoemd als relevant om te kijken of het ons gelukt is om deze factoren ook echt te veranderen.",
-                    "Fase 8: Evaluatie product Heeft interventie bijgedragen aan behalen gewenste uitkomsten? Is het probleemgedrag veranderd?",
-                    "hebben de aanpassingen in de omgeving of die aanpassingen als individuele factoren er nu daadwerkelijk voor gezorgd dat kinderen meer fysiek actief zijn geweest of hun sedentair gedrag hebben verminderd?"
-                ],
-                options: [
-                    { text: "Fase 7: Effectevaluatie, Fase 8: Implementatie-evaluatie", correct: false },
-                    { text: "Fase 7: Evaluatie van het proces (factorverandering), Fase 8: Evaluatie van het product (gedragsverandering/uitkomst)", correct: true },
-                    { text: "Fase 7: Behoefteanalyse, Fase 8: Kosten-batenanalyse", correct: false },
-                    { text: "Fase 7: Contextanalyse, Fase 8: Duurzaamheidsevaluatie", correct: false }
-                ],
-                explanation: "De twee belangrijkste evaluatiefasen zijn: 1. <strong>Fase 7: Evaluatieproces</strong>: Deze fase beoordeelt of de interventie erin geslaagd is de beoogde factoren (determinanten) te beïnvloeden zoals bedoeld. Er wordt gekeken of de gekozen factoren die in Fase 4 als relevant zijn aangemerkt, daadwerkelijk zijn veranderd. 2. <strong>Fase 8: Evaluatie product</strong>: Deze fase beoordeelt of de interventie heeft bijgedragen aan het behalen van de gewenste uitkomsten, specifiek of het problematische gedrag zelf is veranderd (bijv. toegenomen fysieke activiteit of verminderd sedentair gedrag)."
+                question: "Van Kann et al. (2020) spreken van een 'Multi-component' aanpak. Wat is dit en geef een voorbeeld.",
+                studyMaterial: [ "1. Multi-component: wil zeggen dat de beweegstimulering zich op meerdere componenten richt.", "> bewegingsonderwijs > bewegen tijdens schooltijd > bewegen voor en na schooltijd..." ],
+                options: [ { text: "Aanpak op één component; Vb: Alleen gymlessen.", correct: false }, { text: "Aanpak op meerdere componenten; Vb: Bewegen in les, naschoolse sport, ouderbetrokkenheid.", correct: true }, { text: "Aanpak door meerdere personen; Vb: Meerdere gymleraren.", correct: false }, { text: "Aanpak op competitie; Vb: Schooltoernooien.", correct: false } ],
+                explanation: "<strong>Multi-component</strong>: aanpak richt zich op meerdere componenten. Voorbeeld: bewegingsonderwijs, bewegen tijdens schooltijd, en ouderbetrokkenheid."
             },
             {
-                question: "Van Kann et al. (2020) benadrukken dat het simpelweg implementeren van geïsoleerde beweeginitiatieven vaak niet voldoende is. Wat wordt bedoeld met een 'Multi-component' aanpak voor beweegstimulering op scholen, en wat is een voorbeeld van een van de componenten?",
-                studyMaterial: [
-                    "Voor succesvolle beweegstimulering op scholen zijn drie essentiële kenmerken geïdentificeerd.",
-                    "1. Multi-component: wil zeggen dat de beweegstimulering zich op meerdere componenten richt.",
-                    "> bewegingsonderwijs > bewegen tijdens schooltijd > bewegen voor en na schooltijd > betrokkenheid van schoolpersoneel > verbonden & betrokkenheid met ouders en buurt"
-                ],
-                options: [
-                    { text: "Een aanpak die zich richt op één zeer effectieve component; Voorbeeld: Alleen extra gymlessen.", correct: false },
-                    { text: "Een aanpak die zich op meerdere componenten tegelijk richt; Voorbeeld: Bewegen tijdens de les, naschoolse sport en ouderbetrokkenheid.", correct: true },
-                    { text: "Een aanpak die door meerdere personen wordt uitgevoerd; Voorbeeld: Meerdere gymleraren.", correct: false },
-                    { text: "Een aanpak die zich richt op competitieve sporten; Voorbeeld: Schoolsporttoernooien.", correct: false }
-                ],
-                explanation: "Een <strong>Multi-component</strong> aanpak betekent dat beweegstimulering zich op meerdere verschillende gebieden of aspecten tegelijk richt, in plaats van slechts op één. Voorbeelden van componenten zijn: bewegingsonderwijs, bewegen tijdens schooltijd, bewegen voor en na schooltijd, betrokkenheid van schoolpersoneel, en verbondenheid & betrokkenheid met ouders en de buurt."
+                question: "Wat is een belangrijke bevinding van Vos (2020) over MVPA bij overstap PO naar VO? En welk % MVPA op een schooldag was 'na schooltijd' (groep 8 data)?",
+                studyMaterial: [ "Wanneer ze de overstap maken naar het voortgezet onderwijs, is er een aanzienlijke afname van hun dagelijkse matig-tot-zware fysieke activiteit...", "Tabel data... Na schooltijd, 63% van de totale activiteit" ],
+                options: [ { text: "Toename MVPA; 50% na school.", correct: false }, { text: "Geen verandering MVPA; 75% na school.", correct: false }, { text: "Aanzienlijke afname MVPA; 63% na school.", correct: true }, { text: "Lichte toename MVPA; 40% na school.", correct: false } ],
+                explanation: "Bevinding: <strong>aanzienlijke afname</strong> in MVPA. Groep 8: <strong>63%</strong> van MVPA op schooldag was na schooltijd."
             },
             {
-                question: "Wat is volgens het onderzoek van Vos (2020) een belangrijke bevinding met betrekking tot de dagelijkse hoeveelheid matig-tot-zware fysieke activiteit (MVPA) wanneer leerlingen overstappen van de basisschool (PO) naar het voortgezet onderwijs (VO)? En, welk percentage van hun MVPA op een schooldag vond 'na schooltijd' plaats, gebaseerd op de tabelgegevens voor groep 8 leerlingen?",
-                studyMaterial: [
-                    "Leerlingen in het voortgezet onderwijs zijn over het algemeen minder actief dan basisschoolleerlingen.",
-                    "Wanneer ze de overstap maken naar het voortgezet onderwijs, is er een aanzienlijke afname van hun dagelijkse matig-tot-zware fysieke activiteit, zowel op schooldagen als in het weekend.",
-                    "Tabel data voor 'Matig-tot-zware activiteit': '- Reguliere schooldag, Gemiddeld 43.9 minuten (SD=32.3) - Na schooltijd, 63% van de totale activiteit'"
-                ],
-                options: [
-                    { text: "Toename in MVPA; 50% na schooltijd.", correct: false },
-                    { text: "Geen significante verandering in MVPA; 75% na schooltijd.", correct: false },
-                    { text: "Aanzienlijke afname in MVPA; 63% na schooltijd.", correct: true },
-                    { text: "Lichte toename in MVPA; 40% na schooltijd.", correct: false }
-                ],
-                explanation: "Een belangrijke bevinding is dat er een <strong>aanzienlijke afname</strong> is in de dagelijkse matig-tot-zware fysieke activiteit (MVPA) bij leerlingen wanneer zij de overstap maken van het basis- naar het voortgezet onderwijs, waargenomen op zowel schooldagen als in het weekend. Volgens de tabelgegevens voor groep 8 leerlingen (vóór de overstap) vond <strong>63%</strong> van hun totale MVPA op een reguliere schooldag 'na schooltijd' plaats."
-            },
-            {
-                question: "Wat was een primaire reden, geïdentificeerd in het 'Interview shuffle sport', die traditioneel sportaanbod onaantrekkelijk maakt voor veel niet-sportende VMBO-leerlingen, en hoe probeert het kernconcept van ShuffleSports dit aan te pakken?",
-                studyMaterial: [
-                    "Vooral onder de vmbo’ers is het percentage niet-sporters schrikbarend hoog.",
-                    "de huidige sportaanbod wordt geassocieerd met prestatie, terwijl deze jongens sporten voor de gezelligheid en om iets te doen met hun vrienden",
-                    "Door twee bestaande sporten te mixen- zonder ze te matchen, creëren we een nieuwe sport die nog nooit iemand heeft gedaan.",
-                    "Een sportactiviteit waarbij het niet gaat om je de sport kan, maar over samen plezier maken en jezelf uitdagen.",
-                    "> Gezelligheid & plezier > geen competitief imago > Lager instapniveau"
-                ],
-                options: [
-                    { text: "Reden: Te weinig keuzevrijheid; Aanpak: Meer sportopties aanbieden.", correct: false },
-                    { text: "Reden: Associatie met prestatie/vaardigheid; Aanpak: Een nieuwe, onbekende sport creëren waar plezier en lage drempel centraal staan.", correct: true },
-                    { text: "Reden: Te hoge kosten; Aanpak: Gratis sportactiviteiten.", correct: false },
-                    { text: "Reden: Gebrek aan goede faciliteiten; Aanpak: Investeren in nieuwe sportcomplexen.", correct: false }
-                ],
-                explanation: "Een primaire reden waarom traditionele sport onaantrekkelijk is, is dat het vaak <strong>geassocieerd wordt met prestatie en vaardigheid</strong>, terwijl deze leerlingen meer geïnteresseerd zijn in <strong>gezelligheid, plezier en iets doen met vrienden</strong>. ShuffleSports probeert dit aan te pakken door <strong>twee bestaande sporten te mixen om een nieuwe, onbekende sport te creëren</strong>. Het kernidee is dat, aangezien niemand een expert is in deze nieuwe 'geshuffelde' sport, de focus verschuift van vaardigheid en prestatie naar <strong>gedeeld plezier, zelfuitdaging en een lagere instapdrempel</strong>. Dit bevordert 'gezelligheid & plezier' en een 'geen competitief imago'."
+                question: "Primaire reden waarom traditioneel sportaanbod VMBO-jongeren niet aanspreekt ('Interview shuffle sport') en hoe pakt ShuffleSports dit aan?",
+                studyMaterial: [ "de huidige sportaanbod wordt geassocieerd met prestatie, terwijl deze jongens sporten voor de gezelligheid...", "Door twee bestaande sporten te mixen... een nieuwe sport die nog nooit iemand heeft gedaan... niet om je de sport kan, maar over samen plezier maken..." ],
+                options: [ { text: "Reden: Te weinig keuze; Aanpak: Meer opties.", correct: false }, { text: "Reden: Associatie met prestatie; Aanpak: Nieuwe, onbekende sport met focus op plezier.", correct: true }, { text: "Reden: Te hoge kosten; Aanpak: Gratis sport.", correct: false }, { text: "Reden: Slechte faciliteiten; Aanpak: Nieuwe complexen.", correct: false } ],
+                explanation: "Reden: <strong>Associatie met prestatie/vaardigheid</strong>. ShuffleSports aanpak: <strong>nieuwe, onbekende sport creëren</strong> waar plezier en lage drempel centraal staan."
             }
         ];
 
@@ -312,7 +278,7 @@
             answerSelected = false;
             scoreEl.textContent = score;
             totalQuestionsEl.textContent = questions.length;
-            gameAreaEl.classList.remove('hidden');
+            gameAreaEl.style.display = 'block'; // Ensure game area is visible
             endScreenEl.classList.add('hidden');
             nextQuestionBtn.disabled = true;
             loadQuestion();
@@ -325,7 +291,6 @@
             questionTextEl.textContent = currentQuestion.question;
             questionCounterEl.textContent = currentQuestionIndex + 1;
             
-            // Update progress bar
             const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
             progressBarEl.style.width = `${progressPercentage}%`;
 
@@ -346,7 +311,7 @@
             });
 
             feedbackContainerEl.innerHTML = '';
-            feedbackContainerEl.className = 'p-4 rounded-lg min-h-[50px] mb-6'; // Reset classes
+            feedbackContainerEl.className = 'p-4 rounded-lg min-h-[50px] mb-6';
             nextQuestionBtn.disabled = true;
              if (currentQuestionIndex === questions.length - 1) {
                 nextQuestionBtn.textContent = 'Bekijk Resultaten';
@@ -356,13 +321,10 @@
         }
 
         function selectAnswer(button, isCorrect, explanation) {
-            if (answerSelected) return; // Prevent multiple selections
+            if (answerSelected) return;
             answerSelected = true;
 
-            // Disable all answer buttons
-            Array.from(answersContainerEl.children).forEach(btn => {
-                btn.disabled = true;
-            });
+            Array.from(answersContainerEl.children).forEach(btn => { btn.disabled = true; });
             
             if (isCorrect) {
                 score += 10;
@@ -376,8 +338,6 @@
                 button.classList.add('selected-incorrect');
                 feedbackContainerEl.innerHTML = `<p class="font-semibold">Helaas, dat is niet correct.</p><p class="text-sm">${explanation}</p>`;
                 feedbackContainerEl.className = 'p-4 rounded-lg feedback-incorrect mb-6';
-
-                // Highlight the correct answer
                 const correctButton = Array.from(answersContainerEl.children).find((btn, index) => questions[currentQuestionIndex].options[index].correct);
                 if (correctButton) {
                     correctButton.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
@@ -399,26 +359,697 @@
         restartBtn.addEventListener('click', startGame);
 
         function showEndScreen() {
-            gameAreaEl.classList.add('hidden');
+            gameAreaEl.style.display = 'none'; // Hide game area specifically
             endScreenEl.classList.remove('hidden');
             finalScoreEl.textContent = score;
-
             let message = '';
             const percentage = (score / (questions.length * 10)) * 100;
-            if (percentage >= 90) {
-                message = "Uitstekend! Je hebt een zeer goede kennis van de stof!";
-            } else if (percentage >= 70) {
-                message = "Goed gedaan! Je bent goed op weg.";
-            } else if (percentage >= 50) {
-                message = "Redelijk, maar er is ruimte voor verbetering. Bestudeer de stof nog eens goed.";
-            } else {
-                message = "Blijf oefenen! Herhaal de stof om je kennis te verbeteren.";
-            }
+            if (percentage >= 90) message = "Uitstekend! Je hebt een zeer goede kennis van de stof!";
+            else if (percentage >= 70) message = "Goed gedaan! Je bent goed op weg.";
+            else if (percentage >= 50) message = "Redelijk, maar er is ruimte voor verbetering.";
+            else message = "Blijf oefenen! Herhaal de stof om je kennis te verbeteren.";
             finalMessageEl.textContent = message;
         }
+        // --- End Game Logic ---
 
-        // Start the game on load
+        // --- Summary Data and Logic ---
+        const summaryData = [
+            { 
+                id: "gezondheidsbevordering", 
+                title: "Gezondheidsbevordering 1.2 (Brug, 2017)", 
+                content: `<h3>Doelen van gezondheidsbevordering</h3>
+<p>In preventie van ziekten zijn er drie aanknopingspunten waar bevordering van gezond gedrag belangrijk is: primaire preventie, secundaire preventie of vroege opsporing, en tertiaire preventie.</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Primaire preventie:</strong> richten we ons op het voorkomen van een gezondheidsprobleem door het wegnemen van oorzaken of risicofactoren voor aandoeningen. Voorbeeld:
+        <ul class="list-disc ml-5">
+            <li>Preventie van hart- en vaatziekten door stoppen met roken maatregelen</li>
+            <li>Een medische vorm van primaire ziektepreventie is vaccinatie</li>
+        </ul>
+    </li>
+    <li><strong>Secundaire preventie:</strong> proberen we mensen met een voorstadium of vroeg stadium van een aandoening te identificeren zodat gerichte vroeg behandeling, mogelijk is, om erger te voorkomen. Voorbeeld:
+        <ul class="list-disc ml-5">
+            <li>Screening op borstkanker</li>
+            <li>Regelmatig onderzoeken van baby’s</li>
+        </ul>
+    </li>
+    <li><strong>Tertiaire preventie:</strong> richt zich op mensen met een ziekte of handicap. Het doel van tertiaire preventie is om zo goed mogelijk te leven met en het beheersen van de handicap of ziekte om een verdergaande invalidering te voorkomen, om kwaliteit van leven te behouden of te vergroten. Voorbeeld:
+        <ul class="list-disc ml-5">
+            <li>Het volhouden van behandelingen (therapie)</li>
+        </ul>
+    </li>
+</ol>
+
+<h4>Doelgroepen en preventie</h4>
+<p>Bij gezondheidsvoorlichting en -bevordering, en preventie in het algemeen, wordt er een onderscheid gemaakt tussen een hoogrisicobenadering en een populatiebenadering.</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Hoogrisicobenadering:</strong> wordt eerst een risicogroep geïdentificeerd/vastgesteld, op basis van bijvoorbeeld erfelijke eigenschappen of leeftijd.
+        <ul class="list-disc ml-5">
+            <li>Speciale valpreventieprogramma’s voor ouderen</li>
+            <li>Als het relatieve risico op het probleem waar de interventie op is gericht hoog is, maar er betrekkelijk weinig mensen zijn bij wie het risico sterk verhoogd is.</li>
+        </ul>
+    </li>
+    <li><strong>Populatiebenadering:</strong> wordt de hele bevolking of een grote deelgroep daaruit benaderd.
+        <ul class="list-disc ml-5">
+            <li>Publiekscampagnes van organisaties zoals Soa Aids Nederland</li>
+            <li>Kenniscentrum sport</li>
+            <li>Het gemiddelde relatieve risico is laag, maar de prevalentie van het risico is hoog: er zijn veel mensen met een beperkt verhoogd risico.</li>
+        </ul>
+    </li>
+</ol>
+<p>Tegenwoordig wordt vaker het onderscheid gemaakt tussen universele, selectieve, geïndiceerde en zorggerelateerde preventie:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Universele preventie:</strong> richt zich op de totale bevolking of grote groepen daarbinnen. Richt zich op mensen die geen speciaal verhoogd risico hebben. Het doel is om bij alle mensen de gezondheid te verbeteren en de kans op ziekte te verminderen -> primaire preventie en populatiebenadering</li>
+    <li><strong>Selectieve preventie:</strong> is gericht op bevolkingsgroepen met een verhoogd risico en heeft als doel de gezondheid van specifieke risicogroepen te verbeteren -> secundaire prev. en hoogrisicobenadering
+        <ul class="list-disc ml-5">
+            <li>Omdat de preventie wordt aangeboden op basis van screening op een risicofactor</li>
+        </ul>
+    </li>
+    <li><strong>Geïndiceerde preventie:</strong> richt zich op individuen die nog geen gediagnosticeerde ziekte hebben, maar wel beginnende klachten of symptomen. Als doel het ontstaan van ziekte of verdere gezondheidsschade te voorkomen -> secundaire preventie en hoogrisicobenadering</li>
+    <li><strong>Zorg-gerelateerde preventie:</strong> is gericht op individuen met een ziekte en heeft tot doel ziektelast te reduceren en complicaties te voorkomen -> tertiaire preventie</li>
+</ol>
+
+<h4>Middelen om gezondheidsbevordering te bereiken</h4>
+<p>Bij interventies gericht op gedragsverandering wordt vaak in de eerste plaats aan voorlichting gedacht. Maar gedrag kan ook op andere manieren worden beïnvloed, bijvoorbeeld door wetgeving of door het organiseren van voorzieningen.</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Voorlichting:</strong> mensen motiveren tot trainen en helpen bij gezond gedrag.
+        <ul class="list-disc ml-5">
+            <li>Programma’s ter preventie van ongewenste zwangerschap</li>
+            <li>Voorlichtingen over gezond eten en meer bewegen</li>
+            <li>Gebaseerd op vrijwillige gedragsverandering</li>
+            <li>Niet alleen informatieoverdracht maar ook vaardigheidstraining, zelftest</li>
+        </ul>
+    </li>
+    <li><strong>Voorzieningen:</strong> proberen we gezond gedrag gemakkelijker te maken.
+        <ul class="list-disc ml-5">
+            <li>Waterzuivering</li>
+            <li>Infectieziekten tegengaan</li>
+            <li>Fitnessprogramma’s op de werkplek -> primaire preventie</li>
+        </ul>
+    </li>
+    <li><strong>Regelgeving controle en sancties:</strong> wordt geprobeerd gezond gedrag af te dwingen.
+        <ul class="list-disc ml-5">
+            <li>Nederlandse voedsel</li>
+            <li>Verplichting dragen veiligheidsgordel</li>
+            <li>Rookverbod in open- bare ruimten.</li>
+        </ul>
+    </li>
+</ol>
+<p>Gezondheidsbevordering: een combinatie van voorlichting en omgevingsveranderingen die samen gezond gedrag en gezonde leefcondities stimuleren.</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Fysieke, sociaal-culturele, politieke en economische, condities die het gezonde gedrag kunnen beïnvloeden.</li>
+    <li>Juist de combinatie van de verschillende soorten middelen, van voorlichting, voorzieningen en regelgeving, lijkt essentieel voor effectieve gezondheidsbevordering.
+        <ul class="list-disc ml-5">
+            <li>Verkeerveiligheid: voorlichting nodig maar zeker ook regelgeving</li>
+        </ul>
+    </li>
+</ul>
+<p>In het kader van bevordering van gezond gedrag spreken we nu van een ecologische benadering naast een educatieve benadering. Waar vroeger de nadruk vrijwel uitsluitend lag op voorlichting aan individuen met riskant of ongezond gedrag, wordt nu veel genuanceerder gedacht over de doelgroepen van gezondheidsvoorlichting:<br>
+> gezondheidsvoorlichting over alcohol in het verkeer -> persoon onder invloed, ouders, politie, degene die de alcohol verkoopt, alternatieve vormen van vervoer.</p>
+<p>We kunnen op vijf niveaus doelgroepen onderscheiden met daarin de personen die beslissingen nemen:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li>Individueel niveau, zoals personen die risico lopen, risicogedrag vertonen of patiënten</li>
+    <li>Interpersoonlijk of groepsniveau, zoals ouders, vrienden, leerkrachten, hulpverleners</li>
+    <li>Organisatieniveau, zoals directeuren van scholen, managers in bedrijven</li>
+    <li>Lokaal niveau, zoals opinieleiders in wijken of dorpen, redacteuren van lokale kranten</li>
+    <li>Samenlevingsniveau, zoals landelijke politici en ambtenaren of besturen van vakbonden of werkgeversorganisatie</li>
+</ol>
+<p>In veel gevallen zijn het echter anderen die een zekere mate van controle hebben over de omgevingscondities, en zij zijn daarom medeverantwoordelijk voor het (on)gezonde gedrag en de gezondheid van die doelgroep.<br>
+> jonge kinderen eten wat ze thuis krijgen -> interpersoonlijk, dus voorlichting ook ouders<br>
+> in de wijkkrant over gezond voedsel -> lokaal niveau<br>
+> producenten van voedingsmiddelen -> samenlevingsniveau</p>
+
+<h4>Het Model voor Planmatige Gezondheidsvoorlichting en Gedragsverandering</h4>
+<p>Wanneer gezondheidsvoorlichting stapsgewijs en planmatig wordt ontwikkeld, geïmplementeerd en geëvalueerd is de kans op succes groter. Er zijn daarom diverse protocollen of planningsmodellen ontwikkeld die kunnen helpen bij de ontwikkeling van interventies:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Analyse gezondheidsprobleem:</strong> wat nu precies de belangrijke gezondheidsproblemen zijn waarmee een doelgroep wordt geconfronteerd.
+        <ul class="list-disc ml-5">
+            <li>Gezondheid één van de factoren die van invloed zijn op het kwaliteit van het leven</li>
+            <li>Andere factoren: veiligheid, discriminatie en armoede</li>
+            <li>De gezondheidstoestand van een bevolking of groep beschrijven we aan de hand van verschillende indicatoren zoals: sterfte, prevalentie, incidentie en ernst van ziekten</li>
+        </ul>
+    </li>
+    <li><strong>Analyse gedrag:</strong> Deze stap in het model is gericht op de analyse van mogelijke gedragsoorzaken van gezondheidsproblemen en gedragsoplossingen om die problemen het hoofd te bieden.
+        <ul class="list-disc ml-5">
+            <li>Gezond eten, niet roken, genoeg bewegen</li>
+            <li>De omgeving wordt vaak mede bepaald dor het gedrag van zogenoemde beslissers. Gedrag van deze beslissers kan dus, via die omgeving, van invloed zijn op het risico en op het risicogedrag van individuele personen.</li>
+        </ul>
+    </li>
+    <li><strong>Analyse van determinanten van gedrag:</strong> Determinanten zijn factoren die het gedrag veroorzaken.
+        <ul class="list-disc ml-5">
+            <li>Kennis, omgevingsdeterminanten, sociale steun of druk</li>
+        </ul>
+    </li>
+    <li><strong>Interventie ontwikkeling:</strong> interventie ontwikkelen om de determinanten van gedrag en het gedrag zelf te veranderen.
+        <ul class="list-disc ml-5">
+            <li>Interventies gericht op gedragsdeterminanten van het risicogedrag</li>
+            <li>Of het gedrag van beslissers die omgevingsdeterminanten kunnen beïnvloeden.</li>
+            <li>Het uiteindelijke doel is een verbetering van gezondheid en kwaliteit van leven.</li>
+        </ul>
+    </li>
+    <li><strong>Interventie-implementatie en disseminatie:</strong> de uitvoering zoals bedoeld planmatig verspreiden en invoeren.
+        <ul class="list-disc ml-5">
+            <li>Implementatie: uitvoering zoals bedoeld</li>
+            <li>Disseminatie: planmatige verspreiding of invoering</li>
+            <li>Vaak interventies niet juist en niet op voldoende schaal geïmplementeerd. Dit komt omdat men bij de ontwikkeling van een interventie onvoldoende rekening houdt met de wensen van degenen van wie wordt verwacht dat zij de interventie gaan uitvoeren en gebruiken, zoals leerkrachten, huisartsen of verpleegkundigen. Daarnaast gaan programmaontwikkelaars er vaak ten onrechte van uit dat een goed programma zichzelf verkoopt.</li>
+            <li>Vormen van een linkage group/ verbindingsgroep (een groep waarin zowel de programmaontwikkelaars als degene die het programma gaan uitvoeren, vertegenwoordigd zijn).</li>
+        </ul>
+    </li>
+    <li><strong>Evaluatie:</strong> Ten slotte is het belangrijk dat interventies worden geëvalueerd om na te gaan of de interventie de gewenste resultaten heeft en of deze is uitgevoerd zoals gepland.
+        <ul class="list-disc ml-5">
+            <li>Effectevaluatie: heeft de interventie de gewenste resultaten behaald</li>
+            <li>Procesevaluatie: is de interventie uitgevoerd zoals gepland</li>
+            <li>Belangrijk hierbij is dat het evaluatie-instrument precies geschikt is om te evalueren of de gekozen determinanten in stap 3 het gewenste gedrag in stap 1 en 2 hebben kunnen beïnvloeden of niet. En zo ja / nee, waarom dat (niet).</li>
+        </ul>
+    </li>
+</ol>
+<p>Wijken, scholen en werkplekken hebben een groot invloed op het leven van een gezond en kwalitatief leven.</p>
+<p>Gezondheidsbevorderaar: zijn bijvoorbeeld werkzaam bij GGD’s. Geven gezondheidsvoorlichtingen.</p>`
+            },
+            { 
+                id: "valkuilen", 
+                title: "Valkuilen voor gezondheidsvoorlichting 1.3 (Brug, 2017)", 
+                content: `<h3>Valkuilen voor gezondheidsvoorlichting 1.3 (Brug, 2017)</h3>
+<p>De essentie van het model voor Planmatige Gezondheidsvoorlichting schuilt in het stellen van de juiste vragen, en het stapsgewijs komen tot de juiste beslissingen. In de loop van een project bestaat het gevaar dat deze vragen te weinig aan bod komen. Het model helpt om die vragen wel, én in de juiste volgorde én op het juiste moment, te stellen. Hoe belangrijk het gebruik van het model is, willen we illustreren met een aantal veelvoorkomende valkuilen.</p>
+<h4>Valkuil 1: Een niet bestaand probleem</h4>
+<p>Soms kan het gebeuren dat er een project wordt ontwikkeld voor een probleem dat bij nader inzien niet of nauwelijks bestaat. Het is en blijft essentieel om altijd goed na te gaan hoe ernstig een gezondheidsprobleem is en hoe vaak het voorkomt.<br>
+> Interventie voor verminderen sedentair gedrag omdat leerlingen blijkbaar thuis ook veel zitten. Echter bleek dat de leerlingen thuis pokemons gingen vangen dus niet veel sedentair gedrag vertoonde.</p>
+<h4>Valkuil 2: het verkeerde gedrag</h4>
+<p>Soms worden interventies ontwikkeld gericht op gedrag waarvan de relatie met het probleem onbekend of onzeker is.<br>
+> Interventie voor fysieke activiteit, maar uit onderzoek bleek dat de leerlingen allemaal op 10 km afstand woonde van school dus ze haalde sowieso altijd de norm van fysieke activiteit.</p>
+<h4>Valkuil 3: de verkeerde gedragsdeterminanten</h4>
+<p>De valkuil schuilt in het ontwikkelen van interventies die zich richten op determinanten die voor de doelgroep niet relevant zijn.<br>
+> voorlichting geven over de risico’s van het niet gebruiken van kinderzitjes terwijl veel mensen deze risico’s al weten en gewoon het zitje gebruiken. Als er mensen zijn waarbij de kinderen niet in het zitje willen dan moet je een voorlichting houden over het interessant maken van zo’n zitje voor kinderen.</p>
+<h4>Valkuil 4: de verkeerde interventie</h4>
+<p>Het komt zeker voor dat de keuze voor een soort interventie niet past bij het onderliggende probleem en determinanten:<br>
+> bijv. het geven van voorlichtingen terwijl voorzieningen of regelgevingen geschikter zijn.<br>
+> Voor verslaafde drugsgebruikers niet alleen een voorlichting geven over het gebruiken van schone spuiten maar met voorzieningen ervoor zorgen dat die er ook daadwerkelijk zijn.</p>
+<h4>Valkuil 5: de verkeerde implementatie</h4>
+<p>De valkuil schuilt in de ontwikkeling van een interventie met onvoldoende aandacht voor implementatie.<br>
+> er wordt een linkage group samen gesteld maar er wordt hier alleen om de mening gevraagd van de mensen die altijd al veel te zeggen hebben. De leerlingen waardoor de interventie echt bedoeld was wilde uiteindelijk niet meedoen.</p>
+<h4>Valkuil 6: Evaluatie</h4>
+<p>Bij de evaluatie van een project kan er bijvoorbeeld gekeken worden of leerlingen bekend zijn met de interventie. De valkuil schuilt hier in het onjuist kiezen van dit 'evaluatieniveau'. Bekendheid met het project is bijvoorbeeld niet genoeg om echt deelgenomen te hebben aan de activiteiten. Daardoor kun je eigenlijk niet goed zeggen of het nu wel gelukt is om de doelgroep écht te bereiken en om de determinanten van het gedrag van je leerlingen dus te beïnvloeden. Evaluatiematen moeten dus op het juiste niveau worden gekozen, aansluitend bij het specifieke gedrag en de gekozen determinanten.</p>`
+            },
+            {
+                id: "determinanten",
+                title: "Determinanten van gedrag hoofdstuk 4 (Brug, 2017)",
+                content: `<h3>Determinanten van gedrag hoofdstuk 4 (Brug, 2017)</h3>
+<p>Determinanten:</p>
+<p><strong>Persoonlijk:</strong></p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Gedragsintentie, motivatie</li>
+    <li>Attitude, uitkomstverwachtingen</li>
+    <li>Subjectieve norm en ervaren sociale invloed</li>
+    <li>Eigen-effectiviteitsverwachting of waargenomen gedragscontrole</li>
+    <li>Geanticipeerde spijt en morele verplichting</li>
+    <li>Risico-inschatting</li>
+    <li>Kennis en bewustzijn</li>
+    <li>Persoonlijkheidskenmerken</li>
+</ul>
+<p><strong>Omgeving:</strong></p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Fysieke omgeving</li>
+    <li>Sociale omgeving</li>
+    <li>Economische omgeving</li>
+    <li>Politieke omgeving</li>
+</ul>
+
+<h4>Gedragsintentie motivatie</h4>
+<p><strong>Gedragsintentie:</strong> de mate waarin iemand van plan is om een bepaald gedrag uit te voeren.<br>
+> willen stoppen met roken (nadelen van roken -> attitude)(Omgeving stimuleert het stoppen -> sociale omgeving) (prijzen stijgen -> economische omgeving)</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Pas wanneer er voldoende determinanten zijn die positief gerelateerd zijn aan het gedrag zullen mensen de intentie hebben om dat gedrag uit te voeren.</li>
+    <li>Het gedrag dat ze willen uitvoeren zal niet altijd lukken of doorgezet worden</li>
+</ul>
+<p><strong>Motivatie:</strong> hoe sterk iemand gedreven is om dat gedrag uit te voeren</p>
+<p><strong>Intrinsieke motivatie:</strong> komt de drive uit de persoon zelf (ik wil meer bewegen, omdat ik dat dan belangrijk vind, omdat ik sporten leuk vind) <- makkelijker vol te houden</p>
+<p><strong>Extrinsieke motivatie:</strong> de drive een oorzaak heeft die buiten de persoon ligt (Van mijn arts en partner moet ik maar gaan bewegen voor mijn gezondheid)</p>
+
+<h4>Attitude, uitkomstverwachtingen</h4>
+<p><strong>Attitude:</strong> wordt de houding bedoeld van mensen ten aanzien van onderwerpen.</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Gedrag dat heeft geleid tot positieve uitkomsten, zal positieve attitudes ten aanzien van dat gedrag tot gevolg hebben.</li>
+    <li>De attitude van een persoon kan direct worden bepaald door te vragen naar een totaaloordeel, bijvoorbeeld door te vragen in hoeverre iemand het eens of oneens is met de uitspraak ‘niet roken is goed’.</li>
+</ul>
+<p><strong>Beliefs:</strong> overtuigingen</p>
+<p><strong>Uitkomstverwachtingen (outcome expectations):</strong> de specifieke voor- en nadelen die mensen koppelen aan een bepaald gedrag.</p>
+<p>Om attitudes en overtuigingen nader te duiden worden verschillende verdere onderverdelingen gehanteerd. Één van de indelingen gaat uit van een drieverdeling in cognitieve, affectieve en conatieve beliefs.</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Cognitieve beliefs:</strong> gerelateerd aan kennis (bewegen is goed voor het hart)</li>
+    <li><strong>Affectieve beliefs:</strong> meer gerelateerd aan gevoel en emotie (bewegen is plezierig)</li>
+    <li><strong>Conatieve beliefs:</strong> gerelateerd aan gedrag, en daarmee de neiging om in actie te komen (ik onderneem acties om meer te bewegen)</li>
+</ol>
+<p>Een andere indeling die hieraan gerelateerd is:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Instrumentale beliefs:</strong> over gedrag als middel<br>
+    > inschatting van de gevolgen of consequenties van bewegen (je blijft gezond)</li>
+    <li><strong>Experiëntiële beliefs:</strong> over gedrag als ervaring<br>
+    > Of doordat bewegen op zichzelf een bepaalde ervaringswaarde heeft (bewegen is prettig)</li>
+</ol>
+<ul class="list-disc ml-5 mb-3">
+    <li>Korter termijn voordelen vinden veel vaker belangrijker (roken is nu stoer ondanks dat het later voor gezondheidsproblemen zal zorgen)</li>
+</ul>
+<p><strong>Multiplicatieve functie:</strong> attitudes worden gereconstrueerd door de mate waarin men de verschillende overwegingen van toepassing acht op het attitudeobject, te vermenigvuldigen met de respectievelijke evaluaties van die overweging.</p>
+
+<h4>Subjectieve norm en ervaren sociale invloed</h4>
+<p><strong>Subjectieve norm/ perceived norms:</strong> de gepercipieerde verwachtingen van belangrijke anderen<br>
+> mijn vrienden verwachten dat ik gezellig meerook en meedrink.</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Wanneer je niet voldoet hieraan denken mensen dat hier sancties aan vast zitten (sociale invloed)</li>
+    <li>Het is niet alleen van belang welke normatieve verwachtingen een persoon meent dat anderen over zijn gedrag hebben, maar ook de mate waarin die persoon van plan is zich daar iets van aan te trekken Motivation to comply.</li>
+</ul>
+<p>Sociale steun of druk die men ervaart ui de sociale omgeving en het voorbeeldgedrag (modeling) dat men ziet bij anderen.</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>De term sociale druk wordt meestal gebruikt als er sprake is van een negatieve invloed op het gewenste gedrag</li>
+    <li>Sociale steun treedt bijvoorbeeld op wanneer je wordt gesteund in het stoppen met roken
+        <ul class="list-disc ml-5">
+            <li><strong>Emotionele sociale steun:</strong> ik ben er voor je</li>
+            <li><strong>Praktisch sociale steun:</strong> ik help je alle rookartikelen uit het huis te verwijderen</li>
+            <li><strong>Informatieve sociale steun:</strong> ik heb uitgezocht hoeveel geld je per jaar bespaart als je stopt</li>
+            <li><strong>Materiële sociale steun:</strong> ik zal de stoppen-met-roken cursus voor je betalen</li>
+        </ul>
+    </li>
+</ul>
+<p>Mondeling: gaat het om leren door het observeren van andermans gedrag (in omgeving veel roken dan ga jij het ook sneller doen)</p>
+
+<h4>Eigen-effectiviteitsverwachting of waargenomen gedragscontrole</h4>
+<p>Een derde belangrijke determinant is <strong>eigen-effectiviteitsverwachting (self-efficacy):</strong> staat voor de verwachting die mensen hebben over hun eigen vermogen om een bepaald gedrag te kunnen uitvoeren. Dit is op drie dimensies te variëren:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Magnitude:</strong> grootte belang, de inschatting van de moeilijkheid van de vaardigheden die nodig zijn om het gedrag uit te kunnen voeren</li>
+    <li><strong>Generality:</strong> algemeenheid, de inschatting van de problemen die hetzelfde gedrag in verschillende situaties met zich mee kan brengen</li>
+    <li><strong>Strengst:</strong> sterkte, de mate waarin men het vertrouwen heeft gedrag zelf te kunnen uitvoeren</li>
+</ol>
+<ul class="list-disc ml-5 mb-3">
+    <li>Het hoeft niks met elkaar te maken te hebben. Iets kan je moeilijk vinden maar toch denken dat het je gaat lukken. Ook niet roken op werk is makkelijk maar op en feestje moeilijk.</li>
+</ul>
+<p><strong>Attributies:</strong> de oorzaken waaraan de persoon zijn gebrek aan succes toeschrijft (vaker niet gelukt of …. vol te houden).</p>
+<p><strong>Niet-stabiele oorzaak:</strong> de toevallige omstandigheden op dat moment (roken door stress)</p>
+<p><strong>Stabiele oorzaken:</strong> falen toeschrijven aan stabiele oorzaken, zoals de perceptie dat hijzelf een zwakkeling is</p>
+<p><strong>Control beliefs:</strong> de mate waarin mensen denken de capaciteiten en mogelijkheden te hebben het gedrag met succes uit te voeren</p>
+<p><strong>Power of control:</strong> de mate waarin deze factoren geacht worden de uitvoering van het gedrag te kunnen beïnvloeden.</p>
+
+<h4>Geanticipeerde spijt en morele verplichting</h4>
+<p><strong>Geanticipeerde spijt:</strong> gevoelens van spijt of schuld bedoeld die mensen verwacht te ervaren als ze nalaten een bepaald gezondheidsgedrag uit te voeren.<br>
+- Morgen spijt krijgen van te veel drinken dus in de avond iets minder drinken anders spijt</p>
+<p>Dit kan samenhangen met ‘persoonlijke of morele norm’ die mensen ervaren omtrent een gedrag.</p>
+<p><strong>Morele norm:</strong> de perceptie van een individu over de morele correctheid van een gedrag.<br>
+> iemand zoals ik hoort dit niet te doen</p>
+<p><strong>Geanticipeerde trots:</strong> voor het wel doen van het gedrag (gezond gedrag uitvoeren daarna trots)</p>
+
+<h4>Risico inschatting</h4>
+<p>Mensen zullen eerder geneigd zijn zich te laten onderzoeken of het advies van hun arts op te volgen, wanneer zij denken dat zij bevattelijk zijn voor het gezondheidsprobleem (kans) en dat het gezondheidsprobleem mogelijk ernstige consequenties heeft (ervaren ernst).</p>
+<p><strong>Risicoperceptie:</strong> een complex product van risico's op basis van kennis en intuïtie, sociale en demografische, culturele, ethische, politieke en economische, en emotionele factoren.</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Conditionele risico inschatting:</strong> bijvoorbeeld de kans op huidkanker door het onvoldoende beschermen van de huid -> gekeken naar gedrag</li>
+    <li><strong>Relatieve risico-inschatting:</strong> in vergelijking met andere vrouwen van mijn leeftijd is mijn risico op huidkanker hoger</li>
+    <li><strong>Absolute-risico-inschatting:</strong> waar de expliciete vergelijking ontbreekt (ik heb een hoge kans op huidkanker)</li>
+</ol>
+<p><strong>Primaire appraisal:</strong> omdat ik rook heb ik een grotere kans op het krijgen van longkanker</p>
+<p><strong>Secundaire appraisal:</strong> lukt het mij om te stoppen met roken</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Als men het risico hoogschat en mogelijkheid ziet om te stoppen zal men sneller hun gedrag veranderen.</li>
+</ul>
+<p><strong>Angstreductie:</strong> mensen ontkennen het probleem, steken hun hoofd in het zand</p>
+<p><strong>Gevaarreductie:</strong> ik ga stoppen met roken zodat mijn kans op het krijgen van kanker vermindert</p>
+
+<h4>Kennisoverdracht</h4>
+<p>Kennisoverdracht van kennis staat centraal bij gezondheidsvoorlichtingen: informatie over gezondheid en ziekte en specifiek over de gezondheidsrisico’s van bepaalde gedragingen is nodig om gedragsverandering te bewerkstelligen. Verschillende soorten kennis:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li>Kennis die mensen bewust maakt van de relatie tussen een gedrag en een risico (roken kan een hartinfarct veroorzaken)</li>
+    <li>Kennis over hoe je zou kunnen veranderen (hoe stop je met roken)</li>
+    <li>Theoretisch diepgaande kennis zoals de wetenschappelijke kennis (bijvoorbeeld over waarom roken tot longkanker en hart- en vaatziekten leidt.</li>
+</ol>
+<ul class="list-disc ml-5 mb-3">
+    <li>Kennis leidt slechts tot gedragsverandering wanneer mensen graag ‘iets’ zouden willen doen, maar dat niet doen omdat zij niet precies weten hoe zij dat moeten aanpakken.</li>
+</ul>
+<p><strong>Gezondheidsvaardigheden:</strong> een begrip dat weergeeft in hoeverre mensen vaardig zijn om informatie over gezondheid en ziekte te verkrijgen, te begrijpen, te evalueren en correct toe te passen.</p>
+
+<h4>Bewustzijn</h4>
+<p>Wanneer mensen voldoende kennis en inzicht hebben in hun eigen ongezonde gedrag, wordt dat bewustzijn van hun gedrag genoemd (awareness). Men weet vaak toch niet dat hun gedrag ongezond is (vaak denken ze dat ze wel gezond leven door te bewegen en gezond te eten).</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Moeilijk om te weten welk voedsel nog gezond of juist ongezond is.</li>
+    <li>Men vergelijkt zich vaak met andere die minder bewegen of overgewicht hebben. Dan denken ze dat hun het wel goed doen.</li>
+    <li>Een goede inschatting van het eigen risicogedrag kan dus weliswaar een voorwaarde zijn voor gedragsverandering, maar is maar zelfden voldoende voor een gedragsverandering.</li>
+</ul>
+
+<h4>Persoonlijkheidskenmerken</h4>
+<p>De big five bestaat uit een groep van vijf fundamentele persoonlijkheidstrekken, waarbij iedere dimensie bipolair is en varieert tussen telkens twee uitersten:</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Dominant-extravert versus ondergeschikt-introvert (extraversion)</li>
+    <li>Warm-vertrouwend versus koel-achterdochtig (agreeableness)</li>
+    <li>Gelijkmatig-zelfverzekerd versus nerveus-temperamentvol (neuroticism)</li>
+    <li>Open-nieuwsgierig versus gesloten-ongeïnteresseerd (opennes to experience)</li>
+    <li>Betrouwbaar-georganiseerd versus onbetrouwbaar-chaotisch (conscientiousness)</li>
+</ul>
+<p>De persoonlijkheidsmerken naar gedrag van heel algemene karaktertrekken (bijv. extravert), via bepaalde specifiekere gedragstendensen (sociaal, praatgedrag) …. Zo zullen vrouwen die hoog scoren op de dimensie ‘betrouwbaar-georganiseerd’ hun leven sterker organiseren en meer controleren. Het is denkbaar dat deze vrouwen een positievere attitude en eigen effectiviteitsverwachting hebben ten aanzien van het maandelijkse doen van borstzelfonderzoek, en als gevolg daarvan ook vaker een consequenter maandelijks borstzelfonderzoek doen.</p>
+
+<h4>Omgevingsdeterminanten</h4>
+<p>Gedrag niet alleen door persoonlijke factoren wordt bepaald, maar dat ook de interactie met de omgeving daarbij een belangrijke rol speelt.</p>
+<p><strong>Omgevingsdeterminanten:</strong> een factor die als externe stimulus kan dienen om het gedrag van een individu te bepalen.<br>
+> afwezigheid gezonde voedingskeuzes in schoolkantines<br>
+> prijs voor een abonnement bij een sportschool</p>
+<p><strong>Ecologische gedragsmodellen:</strong> definiëren meerdere niveaus en typen van omgevingsfactoren.</p>
+<p>Type omgevingsdeterminanten:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Fysieke omgeving:</strong> De fysieke omgeving verwijst naar de beschikbaarheid van middelen of mogelijkheden om gezond of ongezond gedrag te vertonen.<br>
+    > de aan- of afwezigheid van verkooppunten van condooms<br>
+    > de beschikbaarheid van fruit in huis<br>
+    > of de aanwezigheid van speelplekken in de buurt.</li>
+    <li><strong>Sociaal-culturele omgeving:</strong> verwijst naar de sociale en culturele context waarin het gedrag wordt uitgevoerd. De sociaal-culturele omgeving omvat enerzijds de ervaren sociale invloeden.<br>
+    > hechtheid van het sociale netwerk binnen een vriendengroep<br>
+    > de stijl waarmee ouders hun kinderen opvoeden<br>
+    > religieuze normen ten aanzien van orgaandonatie</li>
+    <li><strong>Economische omgeving:</strong> de economische omgeving betreft de kosten die gerelateerd zijn aan gezond en ongezond gedrag.<br>
+    > kosten van sigaretten, alcohol, zonnebrandcrème en kant- en klaar maaltijden<br>
+    > gezinsinkomen en de economische situatie in het land</li>
+    <li><strong>Politieke omgeving:</strong> verwijst naar de regels en wetgeving die het gezondheidsgedrag kunnen beïnvloeden.<br>
+    > wetgeving omtrent verkoop van alcohol aan jongeren<br>
+    > landelijke beleid met betrekking tot darmkankerscreening<br>
+    > rookverbod op werkplek</li>
+</ol>
+<p>Niveaus omgevingsdeterminanten</p>
+<p>Uit voorgaande voorbeelden van de verschillende typen invloed zal al gebleken zijn dat deze zich op verschillende niveaus bevinden. Drie specifieke niveaus in omgeving:</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Microniveau:</strong> de omgeving op microniveau is de meest proximale omgevingsfactor en wordt vaak aangeduid met de term behavioral setting. Dit verwijst naar de specifieke plek waar het gedrag wordt uitgevoerd, zoals de school, de werkplek of het sportveld.<br>
+    > binnen het gezin<br>
+    > belonen of straffen door de leraar<br>
+    > en de aan of afwezigheid van faciliteiten in die directe omgeving</li>
+    <li><strong>Mesoniveau:</strong> omgevingsinvloeden op mesoniveau betreffen de bredere familie en de nabije omgeving. De aanwezigheid van lokale winkels, de mate van hechting binnen de familie en het schoolbestuur. Invloeden zijn vaak niet direct gericht op het gedrag, maar bieden eerst een context waarin het gedrag gemakkelijk of juist minder gemakkelijk kan plaatsvinden<br>
+    > bosrijke omgeving in de nabijheid met veel wandelbaden</li>
+    <li><strong>Macroniveau:</strong> het macroniveau betreft het bredere systeem dat gedrag kan beïnvloeden via economische ingrepen, culturele normen en waarden en politieke of industriële acties.<br>
+    > gezondheidszorgsysteem<br>
+    > de frisdrankenindustrie<br>
+    > accijnzen op alcoholische dranken</li>
+</ol>
+<p>De manier waarop deze factoren uiteindelijk gedrag beïnvloeden is het resultaat van een samenspel van meerdere omgevingsinvloeden.<br>
+> op macroniveau wordt vastgesteld wat de minimumleeftijd is om sigaretten te kunnen kopen (politieke omgeving). Echter, de mate waarin een verkoper daarmee in praktijk (microniveau) rekening houdt, bijvoorbeeld door legitimatie te vragen, zal uiteindelijk een belangrijke omgevingsdeterminant van het rookgedrag van jongeren zijn.</p>`
+            },
+            {
+                id: "moves",
+                title: "Moves-model",
+                content: `<h3>Moves-model</h3>
+<h4>Fase 1: identificeren gewenste uitkomsten en context</h4>
+<p>Welk gezondheidsprobleem speelt er, bij wie en in welke context of setting?</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Wat voor gedrag rond gezondheid speelt er (beweegrichtlijnen)</li>
+    <li>Bij welke doelgroep</li>
+    <li>Welk gedrag</li>
+</ul>
+<p>↓</p>
+<p>Fysieke activiteit: Specifieke context of setting (bijvoorbeeld actief transport, buiten spelen, sporten)</p>
+<p>Sedentair gedrag: Specifieke context of setting (bijvoorbeeld gamen, theorie les, huiswerk, pauze, tel)</p>
+
+<h4>Fase 2 en 3: Identificeren van factoren die het gedrag beïnvloeden</h4>
+<p>Welke motivationele en omgevingsfactoren beïnvloeden het specifieke gedrag bij onze doelgroep?</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Welke factoren (fysiek of sedentair) het gedrag nu verklaren
+        <ul class="list-disc ml-5">
+            <li><strong>Individuele factoren:</strong> alles wat een persoon zelf denkt of voelt wat te maken heeft met het gedrag. Bijv: intrinsieke motivatie of plezier om na school nog actief te zijn.</li>
+            <li><strong>Omgevingsfactoren:</strong> alles wat buiten een persoon ligt waardoor hij of zij beïnvloed wordt om bijvoorbeeld actief transport te vertonen na school (fietsenstallingen, fietspaden of bijvoorbeeld het hebben van een fiets).</li>
+        </ul>
+    </li>
+    <li>Achterhalen van de factoren of determinanten die van invloed zijn op het gedrag van je doelgroep.</li>
+</ul>
+
+<h4>Fase 4: rangschikken factoren</h4>
+<p>Welke factoren zijn het meest relevant? Hoe vertalen naar de praktijk?</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Wat zijn de meest belangrijkste en relevante factoren/ determinanten
+        <ul class="list-disc ml-5">
+            <li>Rangschikking maken met meest relevante individuele en omgevingsfactoren</li>
+        </ul>
+    </li>
+    <li>Rangschikking van de factoren of determinanten die voor onze doelgroep het meest belangrijk, veranderbaar en haalbaar zijn.
+        <ul class="list-disc ml-5">
+            <li>Daarna bepaal je de globale doelstelling voor je interventie van beweegstimuleringsactiviteiten</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>Fase 5: Plan van aanpak</h4>
+<p>Wie doet wat? Wat zijn de risico’s? hoe/ wat willen we gaan evalueren?</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Plan van aanpak hoe wij ervoor zorgen dat de achterliggende factoren nu beïnvloed gaan worden.</li>
+    <li>Welke soort activiteiten of interventies of aanpassingen aan de omgeving moeten er nu uitgevoerd worden. Wie moet dat doen en welke planning hoort daarbij?</li>
+</ul>
+
+<h4>Fase 6: Implementatie</h4>
+<p>Aan de slag met het implementeren en uitvoeren van ons project -> Uitvoeren zoals gepland.</p>
+
+<h4>Fase 7: Evaluatieproces</h4>
+<p>Is beïnvloeding van factoren gelukt zoals beoogd?</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Evalueren of het gelukt is om de factoren die we in fase 4 hebben genoemd als relevant om te kijken of het ons gelukt is om deze factoren ook echt te veranderen. Zijn mensen ook echt anders gaan denken ten op zichtte van actief transport of hebben die omgevingsfactoren die wij als relevant hebben beschouwd. Is het dan ook echt gelukt om die omgevingsfactoren te veranderen.</li>
+</ul>
+
+<h4>Fase 8: Evaluatie product</h4>
+<p>Heeft interventie bijgedragen aan behalen gewenste uitkomsten? Is het probleemgedrag veranderd?</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Hebben de aanpassingen in de omgeving of die aanpassingen als individuele factoren er nu daadwerkelijk voor gezorgd dat kinderen meer fysiek actief zijn geweest of hun sedentair gedrag hebben verminderd?</li>
+</ul>
+
+<h4>Welke fases hebben invloed op elkaar:</h4>
+<ol class="list-decimal ml-5 mb-3">
+    <li>Bewust gekozen en geplande beweegstimuleringsactiviteiten, gericht op achterliggende factoren van het specifieke probleemgedrag
+        <ul class="list-disc ml-5">
+            <li>Individuele factoren -> fysieke activiteiten en sedentair gedrag -> gezondheid</li>
+            <li>Omgevingsfactoren -> fysieke activiteiten en sedentair gedrag -> gezondheid</li>
+        </ul>
+    </li>
+</ol>
+
+<h4>Welke valkuil uit Brug (2017) probeer je in een bepaalde fase te voorkomen?</h4>
+<p>Valkuil 1 probeer je te voorkomen in fase 1<br>
+Valkuil 1: Een niet bestaand probleem</p>
+<p>Valkuil 2 probeer je te voorkomen in fase 1 of 2/3<br>
+Valkuil 2: het verkeerde gedrag</p>
+<p>Valkuil 3 probeer je te voorkomen in fase 2/3 of 4<br>
+Valkuil 3: de verkeerde gedragsdeterminanten</p>
+<p>Valkuil 4 probeer je te voorkomen in fase 4<br>
+Valkuil 4: de verkeerde interventie</p>
+<p>Valkuil 5 probeer je te voorkomen in fase 5 of 6<br>
+Valkuil 5: de verkeerde implementatie</p>
+<p>Valkuil 6 probeer je te voorkomen in fase 7 en 8<br>
+Valkuil 6: Evaluatie</p>`
+            },
+            {
+                id: "kann",
+                title: "Van Kann et al., 2020 Effectieve beweegstimulering op basisscholen",
+                content: `<h3>Van Kann et al., 2020 Effectieve beweegstimulering op basisscholen</h3>
+<h4>Onvoldoende bewegen</h4>
+<ul class="list-disc ml-5 mb-3">
+    <li>Basisschoolleerlingen bewegen gemiddeld genomen onvoldoende (in bijzonder bovenbouw)</li>
+    <li>Leerlingen die opgroeien in gezinnen met een laag sociaaleconomische status en leerlingen met onderontwikkelde motorische vaardigheden bewegen minder</li>
+    <li>Ze lopen een verhoogd risico op de ontwikkeling van overgewicht</li>
+    <li>Ondanks de bestaande initiatieven, zoals het certificaat Bewegen & Sport van de Gezonde School en een toename van vakdocenten bewegingsonderwijs, is er weinig verbetering te zien in de dagelijkse hoeveelheid beweging van leerlingen</li>
+    <li>De schoolperiode blijkt de meest inactieve periode van de dag te zijn.</li>
+    <li>Het artikel stelt de vraag of we de juiste dingen doen en welke verbeteringen nodig zijn om effectiever te zijn in beweegstimulering op scholen. Het bespreekt de voorwaarden voor een kansrijke aanpak en presenteert een praktijkvoorbeeld dat laat zien welke effecten dit kan hebben op het beweeggedrag van leerlingen.</li>
+</ul>
+
+<h4>Wat kenmerkt een kansrijke aanpak?</h4>
+<p>Voor succesvolle beweegstimulering op scholen zijn drie essentiële kenmerken geïdentificeerd.</p>
+<ol class="list-decimal ml-5 mb-3">
+    <li><strong>Multi-component:</strong> wil zeggen dat de beweegstimulering zich op meerdere componenten richt.
+        <ul class="list-disc ml-5">
+            <li>Bewegingsonderwijs</li>
+            <li>Bewegen tijdens schooltijd</li>
+            <li>Bewegen voor en na schooltijd</li>
+            <li>Betrokkenheid van schoolpersoneel</li>
+            <li>Verbonden & betrokkenheid met ouders en buurt</li>
+        </ul>
+    </li>
+    <li><strong>Synergie tussen omgevingsinvloeden:</strong> waarbij omgevingsfactoren op en rond de school elkaar versterken.
+        <ul class="list-disc ml-5">
+            <li>Inrichting van het schoolplein (fysieke omgeving)</li>
+            <li>Het beleid en de regels die gelden op dit schoolplein (beleidsmatige omgeving)</li>
+        </ul>
+    </li>
+    <li><strong>Wederzijdse aanpassing:</strong> dit principe vereist een nauwe verweving van kennis en theorie (top-down) en praktijkervaringen (bottom-up). Een goede samenwerking tussen kennisinstituten en het werkveld is cruciaal, waarbij werkzame principes worden aangepast aan de lokale context van de school.</li>
+</ol>
+<p>De huidige aanpak van beweegstimulering op scholen lijkt vaak te bestaan uit een vrijblijvende keuze uit afzonderlijke onderdelen, zoals verbeteringen van bewegingsonderwijs, een beweegvriendelijk schoolplein of bewegend leren tijdens reguliere lessen. Hoewel elk van deze aspecten belangrijk is, kan het ontbreken van structurele effecten op het beweeggedrag van basisschoolleerlingen worden verklaard door het gebrek aan een gecoördineerde aanpak die de Multi dimensionaliteit, synergie en wederzijdse aanpassing omvat.</p>
+
+<h4>Keigaaf</h4>
+<p>KEIGAAF is een voorbeeld van een Nederlandse aanpak die de drie kenmerken van effectieve beweegstimulering (Multi-component, synergie tussen omgevingskenmerken en wederzijdse aanpassing) heeft toegepast op basisscholen in Eindhoven, gelegen in aandacht wijken. Binnen deze aanpak worden verschillende interventies ontwikkeld en aangepast aan de schoolcontext. De school analyseert haar fysieke omgeving, beleid en acties op het gebied van beweegstimulering en identificeert componenten die nog onvoldoende aandacht krijgen. Op basis van de behoeften en analyse worden korte- en langetermijndoelen geformuleerd, die door de school en haar belangrijke partners worden nagestreefd.</p>
+<p>↓</p>
+<p>In samenwerking met leerlingen werd het grasveld opnieuw ingericht, en er werd een veilige route gecreëerd tussen school en speelveld. Een rooster werd opgesteld waarin elke klas het veld eenmaal per week bezocht tijdens de ochtendpauze, waarbij de pauze werd verlengd van 15 naar 30 minuten. Deze interventie leidde tot meer beweging door de actieve verplaatsing naar het speelveld en bood extra beweegmogelijkheden in de buurt → Heeft geleid tot verlaging in overgewicht</p>
+
+<h4>Conclusie</h4>
+<p>Effectieve beweegstimulering op basisscholen is een complex proces dat meer tijd en samenhang vereist dan op het eerste gezicht lijkt. Het voorbeeld van KEIGAAF toont aan dat pas na 2 jaar de beweegwinst werd bereikt. Het is belangrijk om slimme koppelingen te maken tussen verschillende componenten van beweegstimulering in de praktijk.</p>
+<p>Beweegstimuleringsmaatregelen hoeven niet per se ingewikkeld of baanbrekend te zijn, maar de samenhang tussen de verschillende onderdelen is essentieel. Simpele suggesties roepen vaak de reactie op dat ze al worden toegepast, maar scholen worden aangemoedigd om nogmaals naar deze suggesties te kijken. Het is belangrijk om te beoordelen of de maatregel in lijn is met andere componenten van beweegstimulering, of deze wordt versterkt of tegengewerkt door andere maatregelen, en of de maatregel optimaal is ingevoerd in de schoolcontext. Ook moet rekening worden gehouden met het continu aanpassen van bestaande maatregelen aan veranderende omstandigheden.</p>
+<p>Vakdocenten in het bewegingsonderwijs moeten ook betrokken worden bij andere componenten dan alleen het bewegingsonderwijs. Zij kunnen als experts een belangrijke rol spelen bij het frequenter gebruik van beweegvoorzieningen op school en in de buurt, evenals bij het inrichten van een actievere schooldag. Het is essentieel dat vakdocenten in het bewegingsonderwijs een sterke verbinding hebben met andere leerkrachten en een centrale rol vervullen op school. Schoolleiders moeten vakdocenten faciliteren om deze rol te kunnen vervullen, vooral voor vakdocenten die lessen bewegingsonderwijs op een externe locatie verzorgen.</p>`
+            },
+            {
+                id: "vos",
+                title: "Vos, S. (2020). Van PO naar VO",
+                content: `<h3>Vos, S. (2020). Van PO naar VO: wat verandert er in het beweeggedrag van leerlingen en waar vindt die verandering plaats?</h3>
+<p>De veranderde omgeving waaraan VO-leerlingen worden blootgesteld lijkt een belangrijke factor in de verklaring van de teruggang van de fysieke activiteit.</p>
+<p>Ongeveer de helft van de Nederlandse basisschoolleerlingen voldoet aan de richtlijn van dagelijks minstens 60 minuten matig-tot-zware fysieke activiteit. Dit percentage daalt tot slechts één op de drie leerlingen tijdens de adolescentie. Leerlingen in het voortgezet onderwijs zijn over het algemeen minder actief dan basisschoolleerlingen. Het is echter niet duidelijk waarom dit gebeurt, welke rol de omgeving speelt en hoe er gericht een positieve invloed op kan worden uitgeoefend. Onderzoek toont aan dat de hoeveelheid matig-tot-zware fysieke activiteit jaarlijks stijgt tot ongeveer 9 jaar, waarna er een lichte daling optreedt. Rond de leeftijd van 13 jaar is er echter een opvallende daling, die mogelijk wordt veroorzaakt door de overgang van het basisonderwijs naar het voortgezet onderwijs. Internationale studies hebben aangetoond dat deze overgang gepaard gaat met een afname van fysieke activiteit. De daling kan deels worden verklaard door andere factoren waaraan leerlingen tijd besteden, zoals huiswerk en bijbaantjes. Hoewel het aantal uren lichamelijke opvoeding per week in de eerste jaren van het voortgezet onderwijs hoger is dan in het basisonderwijs, verandert de omgeving drastisch na de overgang van de basisschool naar het voortgezet onderwijs. Het is echter nog niet uitgebreid bestudeerd wat er precies verandert wanneer leerlingen de overstap maken. Een recent onderzoek volgt leerlingen voor en na de overgang van het basisonderwijs naar het voortgezet onderwijs en maakt gebruik van GPS-trackers en accelerometers om hun beweeggedrag objectief te meten.</p>
+
+<h4>Methode:</h4>
+<p>Het beweeggedrag van leerlingen is opgesplitst in matig-tot-zware fysieke activiteit tijdens weekenddagen en weekdagen, waarbij de weekdagen verder zijn onderverdeeld in verschillende periodes zoals 'voor school', 'tijdens school' en 'na school'. Met behulp van een geografisch informatiesysteem (GIS) zijn de meest gebruikte fysieke omgevingsfactoren in kaart gebracht, zoals thuis, school, sportlocaties en andere locaties. Binnen elke locatie is gekeken naar de duur en intensiteit van het beweeggedrag. Ook het transportgedrag van leerlingen, zowel van en naar school als in hun vrije tijd, is onderzocht. Voor een gedetailleerde beschrijving van alle stappen met betrekking tot datareiniging en data-analyse wordt verwezen naar een internationale publicatie over dit onderzoek (Remmers et al., 2020).</p>
+
+<h4>Resultaten:</h4>
+<table class="min-w-full divide-y divide-gray-200 mb-3 border border-gray-300">
+    <thead class="bg-gray-50">
+        <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aspect</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resultaat</th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        <tr><td class="px-6 py-4 whitespace-nowrap">Aantal deelnemende leerlingen</td><td class="px-6 py-4 whitespace-nowrap">175</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap">Geslachtsverdeling</td><td class="px-6 py-4 whitespace-nowrap">"89 jongens, 86 meisjes"</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap">Gemiddelde leeftijd</td><td class="px-6 py-4 whitespace-nowrap">12.1 jaar (SD=0.4)</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap">Matig-tot-zware activiteit</td><td class="px-6 py-4 whitespace-nowrap"></td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap pl-10">- Reguliere schooldag</td><td class="px-6 py-4 whitespace-nowrap">Gemiddeld 43.9 minuten (SD=32.3)</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap pl-10">- Na schooltijd</td><td class="px-6 py-4 whitespace-nowrap">63% van de totale activiteit</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap pl-10">- Weekenddag</td><td class="px-6 py-4 whitespace-nowrap">Gemiddeld 55.1 minuten (SD=48.6)</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap">Overgang naar brugklas</td><td class="px-6 py-4 whitespace-nowrap"></td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap pl-10">- Matig-tot-zware activiteit</td><td class="px-6 py-4 whitespace-nowrap">34 minuten per dag tijdens schooldagen en weekend</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap">Invloed van locaties</td><td class="px-6 py-4 whitespace-nowrap"></td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap pl-10">- Formele sportlocaties</td><td class="px-6 py-4 whitespace-nowrap">Daling in bezoekfrequentie en aantal kinderen</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap pl-10">- Overige locaties</td><td class="px-6 py-4 whitespace-nowrap">Daling in matig-tot-zware activiteit</td></tr>
+        <tr><td class="px-6 py-4 whitespace-nowrap">Transport naar school</td><td class="px-6 py-4 whitespace-nowrap">Kleine toename in activiteit door grotere afstand</td></tr>
+    </tbody>
+</table>
+
+<h4>Conclusie</h4>
+<p>Leerlingen in groep 8 van de basisschool zijn over het algemeen niet voldoende fysiek actief, vooral op schooldagen. Wanneer ze de overstap maken naar het voortgezet onderwijs, is er een aanzienlijke afname van hun dagelijkse matig-tot-zware fysieke activiteit, zowel op schooldagen als in het weekend. Deze nieuwe inzichten in de rol van de omgeving bij de afname van fysieke activiteit bij leerlingen in het voortgezet onderwijs bieden kansen voor gerichte activiteiten en initiatieven om deze afname te beperken. Zowel het basisonderwijs als het voortgezet onderwijs kunnen maatregelen nemen om de hoeveelheid fysieke activiteit te stimuleren en de daling in activiteit uit te stellen. Het is belangrijk om preventieve acties te ondernemen in het basisonderwijs om uitval in sportdeelname te voorkomen, met specifieke aandacht voor de locaties waar de afname voornamelijk plaatsvindt. In het voortgezet onderwijs zijn er mogelijkheden om het activiteitenniveau op school op peil te houden, maar er is meer uitdaging om naschoolse beweegmogelijkheden te optimaliseren en de uitval van sportdeelname te verminderen. LO-professionals, buurtsportcoaches en sportverenigingen kunnen een sleutelrol spelen bij het enthousiast maken en behouden van leerlingen voor sportdeelname, met een passend aanbod tijdens lessen, naschoolse activiteiten en bij verenigingen. Het is essentieel om de fysieke kenmerken van de schoolomgeving, inclusief sportlocaties, te benutten om stimulerend aanbod effectief te implementeren. Maatwerk is noodzakelijk omdat elke (school)omgeving uniek is. Het vraagt om goed ontwikkelde kennis, vaardigheden en analytische capaciteiten van LO-professionals, evenals verdere professionalisering van de leraar LO om dit complexe vraagstuk aan te pakken.</p>`
+            },
+            {
+                id: "shuffle",
+                title: "Interview shuffle sport",
+                content: `<h3>Interview shuffle sport</h3>
+<h4>Aanleiding:</h4>
+<ul class="list-disc ml-5 mb-3">
+    <li>Een groot gedeelte van de Nederlandse sport niet op regelmatige basis, met vele gezondheidsrisico’s als gevolg. Jongeren tussen de 12 en 17 jaar vormen een grote groep onder deze inactieve Nederlanders. Vooral onder de vmbo’ers is het percentage niet-sporters schrikbarend hoog.</li>
+    <li>De drempel om weer te gaan sporten is voor deze niet sportende vmbo’ers op dit moment te hoog. Dit heeft een aantal redenen
+        <ul class="list-disc ml-5">
+            <li>De huidige sportaanbod wordt geassocieerd met prestatie, terwijl deze jongens sporten voor de gezelligheid en om iets te doen met hun vrienden</li>
+            <li>Daarnaast willen deze jongeren afwisseling en keuzevrijheid. Een lidmaatschap voor een jaar past daarom niet bij hun behoefte.</li>
+            <li>Niet sportende jongeren hebben een laag zelfvertrouwen waardoor meedoen aan een proefles, en dus sporten met een team dat al op een bepaald niveau zit, spannend is en een drempel vormt.</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>ShuffleSports</h4>
+<p>Door twee bestaande sporten te mixen- zonder ze te matchen, creëren we een nieuwe sport die nog nooit iemand heeft gedaan. Een sportactiviteit waarbij het niet gaat om je de sport kan, maar over samen plezier maken en jezelf uitdagen.</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Gezelligheid & plezier</li>
+    <li>Geen competitief imago</li>
+    <li>Keuzevrijheid & afwisseling</li>
+    <li>Lager instapniveau</li>
+</ul>
+
+<h4>Proces:</h4>
+<p>Tijdens het gehele traject hebben we het innovatieproces gevolgd en stond de doelgroep altijd centraal. Dit betekent dat de oplossing is ontworpen voor en door jongeren. Hieronder volgen de 5 stappen van het innovatieproces:</p>
+<ul class="list-disc ml-5 mb-3">
+    <li>Probleem: achter gekomen door middel van interviews</li>
+    <li>Oplossing: met experts en onderzoek dat ze hebben gedaan</li>
+    <li>Simulatie: Test je oplossing</li>
+    <li>Pilot: Ontwerp, bouw en test jouw MvP</li>
+    <li>Groei: hack je groei richting de 40%</li>
+</ul>
+<p>Ze zitten nu nog tussen de pilot en groei want ze kunnen altijd nog groeien en ontwikkelen</p>
+
+<h4>Belangrijk te onthouden:</h4>
+<ul class="list-disc ml-5 mb-3">
+    <li>Continue na afloop evalueren:
+        <ul class="list-disc ml-5">
+            <li>Middels een score kaart waarderen hoe leuk ze het vinden</li>
+            <li>De trainer waarderen</li>
+            <li>En de vraag in hoeverre je het jezelf nog een keer ziet doen</li>
+        </ul>
+    </li>
+    <li>Evalueren:
+        <ul class="list-disc ml-5">
+            <li>Eerst bezig met het werven nog van veel leerlingen</li>
+        </ul>
+    </li>
+    <li>Het is in hun vrije tijd dus het is concurreren tegen gamen</li>
+    <li>Voor niet sportende jongeren, maar ook sportende jongeren mogen meedoen</li>
+    <li>Haalbaarheid: beperking in accommodatie en materialen
+        <ul class="list-disc ml-5">
+            <li>Het is fijn dat het dicht bij school is en niet een sociale plek met gravity</li>
+        </ul>
+    </li>
+    <li>Zet het probleem echt centraal, zo kan je echt een passende oplossing vinden</li>
+</ul>`
+            }
+        ];
+
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const contentPages = {
+            'game-page': document.getElementById('game-page'),
+            'summary-by-parts-page': document.getElementById('summary-by-parts-page'),
+            'full-summary-page': document.getElementById('full-summary-page')
+        };
+        const tocSummaryContainer = document.getElementById('toc-summary-container');
+        const summaryPartContentDisplay = document.getElementById('summary-part-content-display');
+        const fullSummaryContentEl = document.getElementById('full-summary-content');
+
+        // Populate TOC for summary by parts
+        summaryData.forEach(part => {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.textContent = part.title;
+            link.classList.add('block', 'p-2', 'rounded-md', 'hover:bg-violet-100', 'text-slate-700', 'toc-link');
+            link.dataset.summaryId = part.id;
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                displaySummaryPart(part.id);
+                // Active state for TOC links
+                document.querySelectorAll('#toc-summary-container .toc-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+            tocSummaryContainer.appendChild(link);
+        });
+
+        function displaySummaryPart(summaryId) {
+            const part = summaryData.find(p => p.id === summaryId);
+            if (part) {
+                summaryPartContentDisplay.innerHTML = part.content;
+            }
+        }
+
+        // Populate full summary
+        let fullSummaryHTML = '';
+        summaryData.forEach(part => {
+            fullSummaryHTML += `<div class="mb-8">${part.content}</div>`;
+        });
+        fullSummaryContentEl.innerHTML = fullSummaryHTML;
+        
+
+        // Main navigation logic
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetPageId = button.dataset.target;
+
+                // Toggle active class for buttons
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Show/hide content pages
+                Object.values(contentPages).forEach(page => page.classList.add('hidden'));
+                if (contentPages[targetPageId]) {
+                    contentPages[targetPageId].classList.remove('hidden');
+                }
+                // If game page is selected, ensure game area is visible and end screen is hidden
+                if (targetPageId === 'game-page') {
+                    if (gameAreaEl) gameAreaEl.style.display = 'block';
+                    if (endScreenEl) endScreenEl.classList.add('hidden');
+                     // Potentially restart or resume game state if desired
+                }
+            });
+        });
+        
+        // Initialize: Start game and set default view
         startGame();
+        contentPages['game-page'].classList.remove('hidden'); // Show game page by default
+        contentPages['summary-by-parts-page'].classList.add('hidden');
+        contentPages['full-summary-page'].classList.add('hidden');
+        document.querySelector('.nav-btn[data-target="game-page"]').classList.add('active');
+
     </script>
 </body>
 </html>
+
